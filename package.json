@@ -1,0 +1,26 @@
+{
+  "name": "pingora",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.11.0",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "turbo build",
+    "check-types": "turbo check-types",
+    "dev": "turbo dev --filter=@pingora/api --filter=@pingora/worker",
+    "dev:all": "turbo dev",
+    "lint": "turbo lint",
+    "test": "turbo test",
+    "test:unit": "turbo test:unit",
+    "test:integration": "turbo test:integration",
+    "test:e2e": "turbo test:e2e",
+    "db:migrate": "pnpm --filter @pingora/db migrate",
+    "db:seed": "pnpm --filter @pingora/db seed"
+  },
+  "devDependencies": {
+    "turbo": "^2.5.4",
+    "typescript": "^5.8.3"
+  }
+}

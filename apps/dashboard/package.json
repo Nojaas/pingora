@@ -1,0 +1,26 @@
+{
+  "name": "@pingora/dashboard",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "build": "next build",
+    "check-types": "tsc --noEmit",
+    "dev": "next dev --port 3002",
+    "lint": "echo \"lint: not configured yet\"",
+    "start": "next start --port 3002",
+    "test": "echo \"test: not configured yet\"",
+    "test:unit": "echo \"test:unit: not configured yet\""
+  },
+  "dependencies": {
+    "@pingora/shared": "workspace:*",
+    "next": "^15.3.3",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.29",
+    "@types/react": "^19.1.6",
+    "@types/react-dom": "^19.1.5",
+    "typescript": "^5.8.3"
+  }
+}

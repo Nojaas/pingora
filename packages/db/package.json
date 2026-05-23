@@ -1,0 +1,29 @@
+{
+  "name": "@pingora/db",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsup",
+    "check-types": "tsc --noEmit",
+    "lint": "echo \"lint: not configured yet\"",
+    "migrate": "echo \"migrate: prisma schema coming in phase 1\"",
+    "seed": "echo \"seed: coming in phase 1\"",
+    "test": "echo \"test: not configured yet\"",
+    "test:unit": "echo \"test:unit: not configured yet\""
+  },
+  "dependencies": {
+    "@pingora/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.29",
+    "tsup": "^8.5.0",
+    "typescript": "^5.8.3"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "name": "@pingora/worker",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsup",
+    "check-types": "tsc --noEmit",
+    "dev": "tsx watch src/index.ts",
+    "lint": "echo \"lint: not configured yet\"",
+    "start": "node dist/index.js",
+    "test": "echo \"test: not configured yet\"",
+    "test:unit": "echo \"test:unit: not configured yet\""
+  },
+  "dependencies": {
+    "@pingora/db": "workspace:*",
+    "@pingora/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.29",
+    "tsup": "^8.5.0",
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3"
+  }
+}
