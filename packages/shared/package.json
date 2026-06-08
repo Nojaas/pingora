@@ -1,6 +1,6 @@
 {
   "name": "@pingora/shared",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "private": true,
   "type": "module",
   "exports": {
@@ -13,15 +13,17 @@
     "build": "tsup",
     "check-types": "tsc --noEmit",
     "lint": "echo \"lint: not configured yet\"",
-    "test": "echo \"test: not configured yet\"",
-    "test:unit": "echo \"test:unit: not configured yet\""
+    "test": "vitest run",
+    "test:unit": "vitest run"
   },
   "dependencies": {
+    "bullmq": "^5.56.0",
     "zod": "^3.25.56"
   },
   "devDependencies": {
     "@types/node": "^22.15.29",
     "tsup": "^8.5.0",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "vitest": "^3.2.4"
   }
 }
