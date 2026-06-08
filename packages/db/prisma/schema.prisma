@@ -1,0 +1,95 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model ApiKey {
+  id                String            @id @default(cuid())
+  name              String
+  keyHash           String            @unique
+  prefix            String
+  scopes            String[]
+  rateLimit         Int               @default(1000)
+  createdAt         DateTime          @default(now())
+  lastUsedAt        DateTime?
+  expiresAt         DateTime?
+  revoked           Boolean           @default(false)
+  notifications     Notification[]
+  webhookEndpoints  WebhookEndpoint[]
+
+  @@index([prefix])
+}
+
+model Notification {
+  id                String             @id @default(cuid())
+  apiKeyId          String
+  apiKey            ApiKey             @relation(fields: [apiKeyId], references: [id], onDelete: Cascade)
+  channel           Channel
+  recipient         String
+  subject           String?
+  body              String
+  status            NotificationStatus @default(PENDING)
+  attempts          Int                @default(0)
+  metadata          Json?
+  jobId             String?
+  sentAt            DateTime?
+  failedAt          DateTime?
+  error             String?
+  createdAt         DateTime           @default(now())
+  webhookDeliveries WebhookDelivery[]
+
+  @@index([apiKeyId, createdAt])
+  @@index([status])
+  @@index([jobId])
+}
+
+model WebhookEndpoint {
+  id         String            @id @default(cuid())
+  url        String
+  secret     String
+  events     String[]
+  active     Boolean           @default(true)
+  apiKeyId   String
+  apiKey     ApiKey            @relation(fields: [apiKeyId], references: [id], onDelete: Cascade)
+  createdAt  DateTime          @default(now())
+  deliveries WebhookDelivery[]
+
+  @@index([apiKeyId])
+}
+
+model WebhookDelivery {
+  id             String          @id @default(cuid())
+  endpointId     String
+  endpoint       WebhookEndpoint @relation(fields: [endpointId], references: [id], onDelete: Cascade)
+  notificationId String
+  notification   Notification    @relation(fields: [notificationId], references: [id], onDelete: Cascade)
+  event          String
+  payload        Json
+  statusCode     Int?
+  attempts       Int             @default(0)
+  nextRetryAt    DateTime?
+  deliveredAt    DateTime?
+  createdAt      DateTime        @default(now())
+
+  @@index([endpointId])
+  @@index([notificationId])
+  @@index([nextRetryAt])
+}
+
+enum Channel {
+  EMAIL
+  SMS
+  PUSH
+}
+
+enum NotificationStatus {
+  PENDING
+  QUEUED
+  SENT
+  FAILED
+  CANCELLED
+}

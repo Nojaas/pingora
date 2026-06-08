@@ -22,12 +22,13 @@ pnpm-debug.log*
 .idea
 .vscode/*
 !.vscode/extensions.json
+!.vscode/settings.json
 
 # Test / coverage
 coverage
 
 # Prisma
-packages/db/prisma/migrations/**/migration_lock.toml
+packages/db/src/generated/
 
 # Misc
 *.tsbuildinfo

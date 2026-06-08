@@ -10,20 +10,30 @@
     }
   },
   "scripts": {
-    "build": "tsup",
-    "check-types": "tsc --noEmit",
+    "build": "pnpm generate && tsup && cp -R src/generated dist/",
+    "check-types": "pnpm generate && tsc --noEmit",
+    "generate": "prisma generate",
     "lint": "echo \"lint: not configured yet\"",
-    "migrate": "echo \"migrate: prisma schema coming in phase 1\"",
-    "seed": "echo \"seed: coming in phase 1\"",
+    "migrate": "dotenv -e ../../.env -- prisma migrate dev",
+    "migrate:deploy": "dotenv -e ../../.env -- prisma migrate deploy",
+    "seed": "dotenv -e ../../.env -- tsx src/seed.ts",
     "test": "echo \"test: not configured yet\"",
     "test:unit": "echo \"test:unit: not configured yet\""
   },
   "dependencies": {
-    "@pingora/shared": "workspace:*"
+    "@pingora/shared": "workspace:*",
+    "@prisma/adapter-pg": "^7.8.0",
+    "@prisma/client": "^7.8.0",
+    "dotenv": "^16.5.0",
+    "pg": "^8.16.0"
   },
   "devDependencies": {
     "@types/node": "^22.15.29",
+    "@types/pg": "^8.15.2",
+    "dotenv-cli": "^8.0.0",
+    "prisma": "^7.8.0",
     "tsup": "^8.5.0",
+    "tsx": "^4.19.4",
     "typescript": "^5.8.3"
   }
 }

@@ -1,6 +1,17 @@
 export { PINGORA_VERSION } from "@pingora/shared";
+export { prisma } from "./client.js";
+export { prisma as db } from "./client.js";
 
-/** Prisma client — branché à l'étape schéma + migrations */
-export type DbClient = null;
+export {
+  Prisma,
+  PrismaClient,
+  Channel,
+  NotificationStatus,
+} from "./generated/prisma/client.js";
 
-export const db: DbClient = null;
+export type {
+  ApiKey,
+  Notification,
+  WebhookEndpoint,
+  WebhookDelivery,
+} from "./generated/prisma/client.js";
