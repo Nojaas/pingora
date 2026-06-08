@@ -16,11 +16,23 @@
     "test:unit": "turbo test:unit",
     "test:integration": "turbo test:integration",
     "test:e2e": "turbo test:e2e",
+    "db:generate": "pnpm --filter @pingora/db generate",
     "db:migrate": "pnpm --filter @pingora/db migrate",
-    "db:seed": "pnpm --filter @pingora/db seed"
+    "db:migrate:deploy": "pnpm --filter @pingora/db migrate:deploy",
+    "db:seed": "pnpm --filter @pingora/db seed",
+    "infra:up": "docker compose -f infra/docker-compose.yml up -d",
+    "infra:down": "docker compose -f infra/docker-compose.yml down",
+    "postinstall": "pnpm db:generate"
   },
   "devDependencies": {
     "turbo": "^2.5.4",
     "typescript": "^5.8.3"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@prisma/client",
+      "@prisma/engines",
+      "prisma"
+    ]
   }
 }

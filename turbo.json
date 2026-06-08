@@ -5,6 +5,10 @@
       "dependsOn": ["^build"],
       "outputs": ["dist/**", ".next/**", "!.next/cache/**"]
     },
+    "generate": {
+      "dependsOn": ["^generate"],
+      "outputs": ["src/generated/**"]
+    },
     "check-types": {
       "dependsOn": ["^check-types"]
     },
