@@ -5,5 +5,13 @@ export default defineConfig({
   format: ["esm"],
   sourcemap: true,
   clean: true,
-  noExternal: ["@pingora/db", "@pingora/shared"],
+  external: [
+    "@pingora/db",
+    "@pingora/shared",
+    "@prisma/adapter-pg",
+    "@prisma/client",
+    "bullmq",
+    "ioredis",
+    "pg",
+  ],
 });
