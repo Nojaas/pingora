@@ -326,8 +326,8 @@ pnpm install
 # 2. Variables d'environnement
 cp .env.example .env
 
-# 3. Démarrer l'infra (PostgreSQL, Redis, LocalStack, Bull Board)
-docker compose up -d
+# 3. Démarrer l'infra (PostgreSQL, Redis — LocalStack et Bull Board arrivent en phase 4)
+pnpm infra:up
 
 # 4. Migrations Prisma
 pnpm db:migrate
@@ -419,12 +419,12 @@ Les features sont découpées en phases pour progresser étape par étape.
 ### Phase 1 — Fondations
 
 - [x] Setup monorepo (pnpm workspaces + Turborepo)
-- [ ] Schéma Prisma + migrations
-- [ ] Serveur Fastify avec plugin auth (API key)
-- [ ] Route `POST /notifications` — validation Zod
-- [ ] Intégration BullMQ — queue email basique
-- [ ] Worker email avec Nodemailer
-- [ ] Tests unitaires du service de notification
+- [x] Schéma Prisma + migrations
+- [x] Serveur Fastify avec plugin auth (API key)
+- [x] Route `POST /notifications` — validation Zod
+- [x] Intégration BullMQ — queue email basique
+- [x] Worker email avec Nodemailer
+- [x] Tests unitaires du service de notification
 
 ### Phase 2 — Robustesse
 
