@@ -6,12 +6,6 @@
 
 ## Contexte et objectifs
 
-Ce projet est un **exercice d'apprentissage personnel** conçu pour monter en compétences sur l'ensemble de la stack backend/infrastructure, en partant d'une base solide en React/Next.js.
-
-L'idée : construire un service de notifications réaliste — le genre de brique qu'on retrouve dans quasiment tous les SaaS — en couvrant les patterns backend fondamentaux qu'on rencontre en production.
-
-**Ce qu'on apprend ici :**
-
 - Architecture microservice et découplage via files d'attente
 - Conception d'une API REST sécurisée (auth, rate limiting, validation)
 - Gestion de jobs asynchrones avec retry, backoff, dead-letter queues
@@ -19,8 +13,6 @@ L'idée : construire un service de notifications réaliste — le genre de briqu
 - Conteneurisation Docker complète
 - Tests backend (unitaires, intégration)
 - Simulation d'un environnement cloud (LocalStack / AWS)
-
-**Ce que ce projet n'est pas :** une app de prod. Mais elle est conçue pour _pouvoir_ l'être — scalabilité, sécurité et observabilité sont traitées sérieusement.
 
 ---
 
@@ -428,8 +420,8 @@ Les features sont découpées en phases pour progresser étape par étape.
 
 ### Phase 2 — Robustesse
 
-- [ ] Retry avec backoff exponentiel
-- [ ] Dead Letter Queue + alertes
+- [x] Retry avec backoff exponentiel
+- [x] Dead Letter Queue + alertes
 - [ ] Rate limiting par API key (sliding window Redis)
 - [ ] Route `GET /notifications` avec cursor pagination
 - [ ] Tests d'intégration (routes + auth)
