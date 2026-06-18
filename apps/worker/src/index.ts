@@ -2,6 +2,7 @@ import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { config } from "dotenv";
 import { PINGORA_VERSION } from "@pingora/shared";
+import { startEmailDlqWorker } from "./processors/email-dlq.processor.js";
 import { startEmailWorker } from "./processors/email.processor.js";
 
 const rootEnv = resolve(
@@ -10,15 +11,16 @@ const rootEnv = resolve(
 );
 config({ path: rootEnv });
 
-const worker = startEmailWorker();
+const emailWorker = startEmailWorker();
+const emailDlqWorker = startEmailDlqWorker();
 
 console.log(
-  `[pingora-worker] ready (v${PINGORA_VERSION}) — processing email queue`,
+  `[pingora-worker] ready (v${PINGORA_VERSION}) — email + email-dlq queues`,
 );
 
 async function shutdown(signal: string) {
   console.log(`[pingora-worker] ${signal} received, closing...`);
-  await worker.close();
+  await Promise.all([emailWorker.close(), emailDlqWorker.close()]);
   process.exit(0);
 }
 

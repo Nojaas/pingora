@@ -1,11 +1,16 @@
 import { prisma } from "@pingora/db";
 import {
+  areJobAttemptsExhausted,
+  EMAIL_JOB_ATTEMPTS,
   EMAIL_QUEUE_NAME,
   emailJobDataSchema,
+  getExponentialBackoffDelayMs,
   getRedisConnectionOptions,
+  isFinalJobAttempt,
 } from "@pingora/shared";
 import type { Job } from "bullmq";
 import { Worker } from "bullmq";
+import { moveExhaustedEmailJobToDlq } from "../lib/exhausted-job.js";
 import { sendEmail } from "../providers/email.js";
 
 async function processEmailJob(job: Job) {
@@ -15,6 +20,7 @@ async function processEmailJob(job: Job) {
   }
 
   const { notificationId } = parsed.data;
+  const maxAttempts = job.opts.attempts ?? EMAIL_JOB_ATTEMPTS;
 
   const notification = await prisma.notification.findUnique({
     where: { id: notificationId },
@@ -65,20 +71,18 @@ async function processEmailJob(job: Job) {
     const message =
       error instanceof Error ? error.message : "Unknown email send error";
 
-    const maxAttempts = job.opts.attempts ?? 1;
-    const isFinalAttempt = job.attemptsMade + 1 >= maxAttempts;
+    const finalAttempt = isFinalJobAttempt(job.attemptsMade, maxAttempts);
 
     await prisma.notification.update({
       where: { id: notificationId },
       data: {
-        ...(isFinalAttempt
-          ? { status: "FAILED" as const, failedAt: new Date() }
-          : {}),
+        status: finalAttempt ? "FAILED" : "QUEUED",
+        ...(finalAttempt ? { failedAt: new Date() } : {}),
         error: message,
       },
     });
 
-    throw error;
+    throw error instanceof Error ? error : new Error(message);
   }
 }
 
@@ -92,8 +96,36 @@ export function startEmailWorker() {
     console.log(`[email] job ${job.id} completed`, job.returnvalue);
   });
 
-  worker.on("failed", (job, error) => {
-    console.error(`[email] job ${job?.id} failed`, error.message);
+  worker.on("failed", async (job, error) => {
+    if (!job) {
+      console.error("[email] job failed", error.message);
+      return;
+    }
+
+    const maxAttempts = job.opts.attempts ?? EMAIL_JOB_ATTEMPTS;
+    const exhausted = areJobAttemptsExhausted(job.attemptsMade, maxAttempts);
+
+    if (exhausted) {
+      try {
+        const dlqJobId = await moveExhaustedEmailJobToDlq(job, error);
+        console.error(
+          `[email] job ${job.id} moved to DLQ as ${dlqJobId} after ${maxAttempts} attempts`,
+          error.message,
+        );
+      } catch (dlqError) {
+        console.error(
+          `[email] job ${job.id} exhausted but DLQ enqueue failed`,
+          dlqError instanceof Error ? dlqError.message : dlqError,
+        );
+      }
+      return;
+    }
+
+    const retryInMs = getExponentialBackoffDelayMs(job.attemptsMade);
+    console.warn(
+      `[email] job ${job.id} attempt ${job.attemptsMade}/${maxAttempts} failed, retry in ~${retryInMs}ms`,
+      error.message,
+    );
   });
 
   return worker;
