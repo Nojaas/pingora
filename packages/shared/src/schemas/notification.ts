@@ -4,6 +4,27 @@ export const notificationChannelSchema = z.enum(["email", "sms", "push"]);
 
 export type NotificationChannelInput = z.infer<typeof notificationChannelSchema>;
 
+export const notificationStatusSchema = z.enum([
+  "pending",
+  "queued",
+  "sent",
+  "failed",
+  "cancelled",
+]);
+
+export type NotificationStatusInput = z.infer<typeof notificationStatusSchema>;
+
+export const listNotificationsQuerySchema = z.object({
+  cursor: z.string().trim().min(1).optional(),
+  limit: z.coerce.number().int().min(1).max(100).default(20),
+  status: notificationStatusSchema.optional(),
+  channel: notificationChannelSchema.optional(),
+});
+
+export type ListNotificationsQuery = z.infer<
+  typeof listNotificationsQuerySchema
+>;
+
 export const createNotificationBodySchema = z
   .object({
     channel: notificationChannelSchema,
@@ -56,6 +77,21 @@ export const PRISMA_CHANNEL_MAP = {
 
 export function toPrismaChannel(channel: NotificationChannelInput) {
   return PRISMA_CHANNEL_MAP[channel];
+}
+
+export const PRISMA_STATUS_MAP = {
+  pending: "PENDING",
+  queued: "QUEUED",
+  sent: "SENT",
+  failed: "FAILED",
+  cancelled: "CANCELLED",
+} as const satisfies Record<
+  NotificationStatusInput,
+  "PENDING" | "QUEUED" | "SENT" | "FAILED" | "CANCELLED"
+>;
+
+export function toPrismaStatus(status: NotificationStatusInput) {
+  return PRISMA_STATUS_MAP[status];
 }
 
 export function toApiChannel(channel: "EMAIL" | "SMS" | "PUSH") {

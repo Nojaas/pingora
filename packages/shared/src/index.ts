@@ -10,14 +10,19 @@ export type { Scope } from "./api-key.js";
 
 export {
   createNotificationBodySchema,
+  listNotificationsQuerySchema,
   notificationChannelSchema,
+  notificationStatusSchema,
   toApiChannel,
   toApiStatus,
   toPrismaChannel,
+  toPrismaStatus,
 } from "./schemas/notification.js";
 export type {
   CreateNotificationBody,
+  ListNotificationsQuery,
   NotificationChannelInput,
+  NotificationStatusInput,
 } from "./schemas/notification.js";
 
 export { formatZodError } from "./validation.js";
@@ -53,3 +58,12 @@ export {
   emailDlqJobDataSchema,
 } from "./queues/dlq.js";
 export type { EmailDlqJobData } from "./queues/dlq.js";
+
+export {
+  RATE_LIMIT_KEY_PREFIX,
+  RATE_LIMIT_WINDOW_MS,
+  SLIDING_WINDOW_RATE_LIMIT_SCRIPT,
+  buildRateLimitKey,
+  parseSlidingWindowRateLimitResult,
+} from "./rate-limit.js";
+export type { RateLimitDecision } from "./rate-limit.js";

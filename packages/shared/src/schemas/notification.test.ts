@@ -1,9 +1,11 @@
 import { describe, expect, it } from "vitest";
 import {
   createNotificationBodySchema,
+  listNotificationsQuerySchema,
   toApiChannel,
   toApiStatus,
   toPrismaChannel,
+  toPrismaStatus,
 } from "./notification.js";
 
 const validEmailPayload = {
@@ -71,6 +73,39 @@ describe("createNotificationBodySchema", () => {
   });
 });
 
+describe("listNotificationsQuerySchema", () => {
+  it("applies defaults", () => {
+    const result = listNotificationsQuerySchema.safeParse({});
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.limit).toBe(20);
+    }
+  });
+
+  it("accepts filters and cursor", () => {
+    const result = listNotificationsQuerySchema.safeParse({
+      cursor: "notif_abc",
+      limit: "10",
+      status: "queued",
+      channel: "email",
+    });
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data).toEqual({
+        cursor: "notif_abc",
+        limit: 10,
+        status: "queued",
+        channel: "email",
+      });
+    }
+  });
+
+  it("rejects limit above 100", () => {
+    const result = listNotificationsQuerySchema.safeParse({ limit: "101" });
+    expect(result.success).toBe(false);
+  });
+});
+
 describe("channel and status mappers", () => {
   it("maps api channel to prisma enum", () => {
     expect(toPrismaChannel("email")).toBe("EMAIL");
@@ -85,5 +120,10 @@ describe("channel and status mappers", () => {
   it("maps prisma status to api lowercase", () => {
     expect(toApiStatus("QUEUED")).toBe("queued");
     expect(toApiStatus("PENDING")).toBe("pending");
+  });
+
+  it("maps api status to prisma enum", () => {
+    expect(toPrismaStatus("queued")).toBe("QUEUED");
+    expect(toPrismaStatus("failed")).toBe("FAILED");
   });
 });
