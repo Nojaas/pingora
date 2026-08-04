@@ -422,9 +422,9 @@ Les features sont découpées en phases pour progresser étape par étape.
 
 - [x] Retry avec backoff exponentiel
 - [x] Dead Letter Queue + alertes
-- [ ] Rate limiting par API key (sliding window Redis)
-- [ ] Route `GET /notifications` avec cursor pagination
-- [ ] Tests d'intégration (routes + auth)
+- [x] Rate limiting par API key (sliding window Redis)
+- [x] Route `GET /notifications` avec cursor pagination
+- [x] Tests d'intégration (routes + auth)
 
 ### Phase 3 — Webhooks
 
@@ -446,6 +446,8 @@ Les features sont découpées en phases pour progresser étape par étape.
 - [ ] Dashboard Next.js (liste notifs, statut queues)
 - [ ] Tanstack Query + Zustand
 - [ ] Pipeline GitHub Actions (lint → test → build → push image)
+
+idée de feeature pour apres : un canal de notification "résumé intelligent" ou un endpoint qui génère du contenu
 
 ---
 
