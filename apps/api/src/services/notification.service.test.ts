@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mockCreate = vi.fn();
 const mockUpdate = vi.fn();
+const mockFindMany = vi.fn();
 const mockEnqueue = vi.fn();
 
 vi.mock("@pingora/db", () => ({
@@ -9,6 +10,7 @@ vi.mock("@pingora/db", () => ({
     notification: {
       create: (...args: unknown[]) => mockCreate(...args),
       update: (...args: unknown[]) => mockUpdate(...args),
+      findMany: (...args: unknown[]) => mockFindMany(...args),
     },
   },
   Prisma: {},
@@ -18,9 +20,12 @@ vi.mock("../queues/email.queue.js", () => ({
   enqueueEmailNotification: (...args: unknown[]) => mockEnqueue(...args),
 }));
 
-const { createNotification, toNotificationResponse } = await import(
-  "./notification.service.js"
-);
+const {
+  createNotification,
+  listNotifications,
+  toNotificationResponse,
+  toNotificationsListResponse,
+} = await import("./notification.service.js");
 
 const apiKeyId = "key_test_123";
 
@@ -102,6 +107,80 @@ describe("createNotification", () => {
     expect(mockUpdate).not.toHaveBeenCalled();
     expect(result).toEqual(created);
     expect(result.status).toBe("PENDING");
+  });
+});
+
+describe("listNotifications", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("queries notifications scoped to the api key with cursor filters", async () => {
+    mockFindMany.mockResolvedValue([]);
+
+    await listNotifications(apiKeyId, {
+      cursor: "notif_cursor",
+      limit: 10,
+      status: "queued",
+      channel: "email",
+    });
+
+    expect(mockFindMany).toHaveBeenCalledWith({
+      where: {
+        apiKeyId,
+        id: { lt: "notif_cursor" },
+        status: "QUEUED",
+        channel: "EMAIL",
+      },
+      orderBy: { id: "desc" },
+      take: 11,
+      select: {
+        id: true,
+        status: true,
+        channel: true,
+        recipient: true,
+        createdAt: true,
+      },
+    });
+  });
+});
+
+describe("toNotificationsListResponse", () => {
+  const baseRecord = {
+    status: "QUEUED" as const,
+    channel: "EMAIL" as const,
+    recipient: "user@example.com",
+    createdAt: new Date("2025-01-15T10:30:00.000Z"),
+  };
+
+  it("returns pagination metadata when more items exist", () => {
+    const response = toNotificationsListResponse(
+      [
+        { id: "notif_3", ...baseRecord },
+        { id: "notif_2", ...baseRecord },
+        { id: "notif_1", ...baseRecord },
+      ],
+      2,
+    );
+
+    expect(response.data).toHaveLength(2);
+    expect(response.data[0]?.id).toBe("notif_3");
+    expect(response.pagination).toEqual({
+      nextCursor: "notif_2",
+      hasMore: true,
+    });
+  });
+
+  it("returns null next cursor when page is complete", () => {
+    const response = toNotificationsListResponse(
+      [{ id: "notif_1", ...baseRecord }],
+      20,
+    );
+
+    expect(response.pagination).toEqual({
+      nextCursor: null,
+      hasMore: false,
+    });
   });
 });
 
