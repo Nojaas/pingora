@@ -24,13 +24,28 @@ export type StoredNotification = {
   createdAt: Date;
 };
 
+export type StoredWebhookEndpoint = {
+  id: string;
+  apiKeyId: string;
+  url: string;
+  secret: string;
+  events: string[];
+  active: boolean;
+  createdAt: Date;
+};
+
 export const API_KEYS = {
   full: {
     raw: "nfh_test_integration_full_access_key",
     id: "key_integration_full",
     name: "Integration Full",
     prefix: "nfh_test_int",
-    scopes: [SCOPES.NOTIFICATIONS_READ, SCOPES.NOTIFICATIONS_WRITE],
+    scopes: [
+      SCOPES.NOTIFICATIONS_READ,
+      SCOPES.NOTIFICATIONS_WRITE,
+      SCOPES.WEBHOOKS_READ,
+      SCOPES.WEBHOOKS_WRITE,
+    ],
     rateLimit: 1000,
   },
   readOnly: {
@@ -38,7 +53,7 @@ export const API_KEYS = {
     id: "key_integration_read",
     name: "Integration Read",
     prefix: "nfh_test_rd",
-    scopes: [SCOPES.NOTIFICATIONS_READ],
+    scopes: [SCOPES.NOTIFICATIONS_READ, SCOPES.WEBHOOKS_READ],
     rateLimit: 1000,
   },
   revoked: {
@@ -46,7 +61,12 @@ export const API_KEYS = {
     id: "key_integration_revoked",
     name: "Integration Revoked",
     prefix: "nfh_test_rv",
-    scopes: [SCOPES.NOTIFICATIONS_READ, SCOPES.NOTIFICATIONS_WRITE],
+    scopes: [
+      SCOPES.NOTIFICATIONS_READ,
+      SCOPES.NOTIFICATIONS_WRITE,
+      SCOPES.WEBHOOKS_READ,
+      SCOPES.WEBHOOKS_WRITE,
+    ],
     rateLimit: 1000,
   },
 } as const;
@@ -54,13 +74,17 @@ export const API_KEYS = {
 export const prismaStore = {
   apiKeys: [] as StoredApiKey[],
   notifications: [] as StoredNotification[],
+  webhookEndpoints: [] as StoredWebhookEndpoint[],
   notificationSeq: 0,
+  webhookSeq: 0,
 };
 
 export function resetPrismaStore() {
   prismaStore.apiKeys = [];
   prismaStore.notifications = [];
+  prismaStore.webhookEndpoints = [];
   prismaStore.notificationSeq = 0;
+  prismaStore.webhookSeq = 0;
 }
 
 export function seedIntegrationApiKeys() {

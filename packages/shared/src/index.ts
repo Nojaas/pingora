@@ -80,3 +80,13 @@ export type {
   SignedWebhook,
   VerifyWebhookSignatureOptions,
 } from "./webhook-signature.js";
+
+export {
+  WEBHOOK_EVENTS,
+  createWebhookEndpointBodySchema,
+  webhookEventSchema,
+} from "./schemas/webhook.js";
+export type {
+  CreateWebhookEndpointBody,
+  WebhookEvent,
+} from "./schemas/webhook.js";
