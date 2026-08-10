@@ -67,3 +67,16 @@ export {
   parseSlidingWindowRateLimitResult,
 } from "./rate-limit.js";
 export type { RateLimitDecision } from "./rate-limit.js";
+
+export {
+  WEBHOOK_SIGNATURE_HEADER,
+  WEBHOOK_SIGNATURE_SCHEME,
+  buildWebhookSignedPayload,
+  parseWebhookSignatureHeader,
+  signWebhookPayload,
+  verifyWebhookSignature,
+} from "./webhook-signature.js";
+export type {
+  SignedWebhook,
+  VerifyWebhookSignatureOptions,
+} from "./webhook-signature.js";

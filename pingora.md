@@ -429,7 +429,7 @@ Les features sont découpées en phases pour progresser étape par étape.
 ### Phase 3 — Webhooks
 
 - [ ] Endpoints webhook (CRUD)
-- [ ] Signature HMAC-SHA256
+- [x] Signature HMAC-SHA256
 - [ ] Queue webhook avec retry
 - [ ] Réception de webhooks externes (parsing + vérification signature)
 
