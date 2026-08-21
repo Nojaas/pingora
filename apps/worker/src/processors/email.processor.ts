@@ -7,9 +7,11 @@ import {
   getExponentialBackoffDelayMs,
   getRedisConnectionOptions,
   isFinalJobAttempt,
+  WEBHOOK_EVENTS,
 } from "@pingora/shared";
 import type { Job } from "bullmq";
 import { Worker } from "bullmq";
+import { dispatchNotificationWebhooks } from "../lib/dispatch-webhooks.js";
 import { moveExhaustedEmailJobToDlq } from "../lib/exhausted-job.js";
 import { sendEmail } from "../providers/email.js";
 
@@ -66,6 +68,11 @@ async function processEmailJob(job: Job) {
       },
     });
 
+    await dispatchNotificationWebhooksSafely(
+      notificationId,
+      WEBHOOK_EVENTS.NOTIFICATION_SENT,
+    );
+
     return { messageId, status: "SENT" as const };
   } catch (error) {
     const message =
@@ -82,7 +89,33 @@ async function processEmailJob(job: Job) {
       },
     });
 
+    if (finalAttempt) {
+      await dispatchNotificationWebhooksSafely(
+        notificationId,
+        WEBHOOK_EVENTS.NOTIFICATION_FAILED,
+      );
+    }
+
     throw error instanceof Error ? error : new Error(message);
+  }
+}
+
+async function dispatchNotificationWebhooksSafely(
+  notificationId: string,
+  event: (typeof WEBHOOK_EVENTS)[keyof typeof WEBHOOK_EVENTS],
+) {
+  try {
+    const result = await dispatchNotificationWebhooks(notificationId, event);
+    if (result.enqueued > 0) {
+      console.log(
+        `[email] dispatched ${result.enqueued} webhook(s) for ${notificationId} (${event})`,
+      );
+    }
+  } catch (error) {
+    console.error(
+      `[email] webhook dispatch failed for ${notificationId} (${event})`,
+      error instanceof Error ? error.message : error,
+    );
   }
 }
 
