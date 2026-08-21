@@ -1,8 +1,13 @@
-import { API_KEY_HEADER } from "@pingora/shared";
+import {
+  API_KEY_HEADER,
+  signWebhookPayload,
+  WEBHOOK_SIGNATURE_HEADER,
+} from "@pingora/shared";
 import type { FastifyInstance } from "fastify";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { buildApp } from "../../app.js";
 import {
+  inboundIdempotencyKeys,
   mockCheckRateLimit,
   mockEnqueueEmail,
 } from "../setup.integration.js";
@@ -485,5 +490,113 @@ describe("API integration — webhooks", () => {
 
     expect(response.statusCode).toBe(404);
     expect(prismaStore.webhookEndpoints).toHaveLength(1);
+  });
+});
+
+describe("API integration — inbound webhooks", () => {
+  let app: FastifyInstance;
+  const inboundSecret = "whsec_inbound_test_secret";
+
+  beforeEach(async () => {
+    seedIntegrationApiKeys();
+    inboundIdempotencyKeys.clear();
+    process.env.INBOUND_WEBHOOK_SECRET = inboundSecret;
+    mockCheckRateLimit.mockResolvedValue({
+      allowed: true,
+      limit: 1000,
+      remaining: 999,
+      resetAt: Math.floor(Date.now() / 1000) + 60,
+    });
+    app = await createTestApp();
+  });
+
+  afterEach(async () => {
+    await app.close();
+    delete process.env.INBOUND_WEBHOOK_SECRET;
+    vi.clearAllMocks();
+  });
+
+  it("accepts a valid signed payload without API key", async () => {
+    const body = JSON.stringify({
+      id: "evt_integration_1",
+      type: "provider.ping",
+      data: { ok: true },
+    });
+    const { header } = signWebhookPayload(inboundSecret, body);
+
+    const response = await app.inject({
+      method: "POST",
+      url: "/webhooks/inbound",
+      headers: {
+        "content-type": "application/json",
+        [WEBHOOK_SIGNATURE_HEADER]: header,
+      },
+      payload: body,
+    });
+
+    expect(response.statusCode).toBe(200);
+    expect(response.json()).toEqual({
+      received: true,
+      id: "evt_integration_1",
+      type: "provider.ping",
+      duplicate: false,
+    });
+  });
+
+  it("returns 401 for an invalid signature", async () => {
+    const body = JSON.stringify({
+      id: "evt_integration_2",
+      type: "provider.ping",
+    });
+
+    const response = await app.inject({
+      method: "POST",
+      url: "/webhooks/inbound",
+      headers: {
+        "content-type": "application/json",
+        [WEBHOOK_SIGNATURE_HEADER]: "t=1700000000,v1=deadbeef",
+      },
+      payload: body,
+    });
+
+    expect(response.statusCode).toBe(401);
+    expect(response.json()).toMatchObject({
+      error: "unauthorized",
+      message: "Invalid webhook signature",
+    });
+  });
+
+  it("returns duplicate=true on replay of the same event id", async () => {
+    const body = JSON.stringify({
+      id: "evt_integration_dup",
+      type: "provider.ping",
+    });
+    const { header } = signWebhookPayload(inboundSecret, body);
+
+    const first = await app.inject({
+      method: "POST",
+      url: "/webhooks/inbound",
+      headers: {
+        "content-type": "application/json",
+        [WEBHOOK_SIGNATURE_HEADER]: header,
+      },
+      payload: body,
+    });
+    const second = await app.inject({
+      method: "POST",
+      url: "/webhooks/inbound",
+      headers: {
+        "content-type": "application/json",
+        [WEBHOOK_SIGNATURE_HEADER]: header,
+      },
+      payload: body,
+    });
+
+    expect(first.json()).toMatchObject({ duplicate: false });
+    expect(second.statusCode).toBe(200);
+    expect(second.json()).toMatchObject({
+      id: "evt_integration_dup",
+      duplicate: true,
+    });
   });
 });

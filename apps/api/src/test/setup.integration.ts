@@ -191,6 +191,26 @@ vi.mock("../lib/rate-limit.js", async (importOriginal) => {
   };
 });
 
+export const inboundIdempotencyKeys = new Set<string>();
+
 vi.mock("../lib/redis.js", () => ({
-  getRedisClient: () => ({}),
+  getRedisClient: () => ({
+    set: async (
+      key: string,
+      _value: string,
+      _ex: string,
+      _ttl: number,
+      nx?: string,
+    ) => {
+      if (nx === "NX") {
+        if (inboundIdempotencyKeys.has(key)) {
+          return null;
+        }
+        inboundIdempotencyKeys.add(key);
+        return "OK";
+      }
+      inboundIdempotencyKeys.add(key);
+      return "OK";
+    },
+  }),
 }));
