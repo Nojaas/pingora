@@ -8,6 +8,7 @@ import healthRoutes from "./routes/health.js";
 import meRoutes from "./routes/me.js";
 import notificationsRoutes from "./routes/notifications.js";
 import webhooksRoutes from "./routes/webhooks.js";
+import inboundWebhooksRoutes from "./routes/inbound-webhooks.js";
 
 const rootEnv = resolve(
   dirname(fileURLToPath(import.meta.url)),
@@ -24,6 +25,7 @@ export async function buildApp(options?: { logger?: boolean }) {
   await app.register(meRoutes);
   await app.register(notificationsRoutes);
   await app.register(webhooksRoutes);
+  await app.register(inboundWebhooksRoutes);
 
   return app;
 }

@@ -92,6 +92,14 @@ export type {
 } from "./schemas/webhook.js";
 
 export {
+  INBOUND_WEBHOOK_IDEMPOTENCY_PREFIX,
+  INBOUND_WEBHOOK_IDEMPOTENCY_TTL_SECONDS,
+  buildInboundIdempotencyKey,
+  inboundWebhookBodySchema,
+} from "./schemas/inbound-webhook.js";
+export type { InboundWebhookBody } from "./schemas/inbound-webhook.js";
+
+export {
   WEBHOOK_DELIVERY_TIMEOUT_MS,
   WEBHOOK_JOB_ATTEMPTS,
   WEBHOOK_JOB_BACKOFF,

@@ -431,7 +431,7 @@ Les features sont découpées en phases pour progresser étape par étape.
 - [x] Endpoints webhook (CRUD)
 - [x] Signature HMAC-SHA256
 - [x] Queue webhook avec retry
-- [ ] Réception de webhooks externes (parsing + vérification signature)
+- [x] Réception de webhooks externes (parsing + vérification signature)
 
 ### Phase 4 — Infra & Observabilité
 
