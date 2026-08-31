@@ -1,3 +1,22 @@
+# Infra seule (hybride local) : pnpm infra:up
+# Stack complète (api + worker) : pnpm docker:up
+
+name: pingora
+
+x-app-environment: &app-environment
+  NODE_ENV: production
+  PORT: "3000"
+  DATABASE_URL: postgresql://postgres:postgres@postgres:5432/pingora
+  REDIS_URL: redis://redis:6379
+  RATE_LIMIT_WINDOW_MS: "60000"
+  ADMIN_SECRET: change_me_in_prod
+  INBOUND_WEBHOOK_SECRET: whsec_dev_inbound_change_me
+  EMAIL_PROVIDER: nodemailer
+  SMTP_HOST: mailpit
+  SMTP_PORT: "1025"
+  SMTP_FROM: pingora@localhost
+  SMS_PROVIDER: mock
+
 services:
   postgres:
     image: postgres:16-alpine
@@ -15,6 +34,7 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+      start_period: 10s
 
   redis:
     image: redis:7-alpine
@@ -26,6 +46,7 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+      start_period: 5s
 
   mailpit:
     image: axllent/mailpit:latest
@@ -33,6 +54,76 @@ services:
     ports:
       - "1025:1025"
       - "8025:8025"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8025/livez"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  migrate:
+    profiles: ["app"]
+    build:
+      context: ..
+      dockerfile: apps/api/Dockerfile
+      target: dev
+    command: ["sh", "-c", "cd packages/db && pnpm exec prisma migrate deploy"]
+    environment:
+      <<: *app-environment
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
+
+  api:
+    profiles: ["app"]
+    build:
+      context: ..
+      dockerfile: apps/api/Dockerfile
+      target: prod
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      <<: *app-environment
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+  worker:
+    profiles: ["app"]
+    build:
+      context: ..
+      dockerfile: apps/worker/Dockerfile
+      target: prod
+    restart: unless-stopped
+    environment:
+      <<: *app-environment
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      mailpit:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "kill -0 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
 
 volumes:
   pingora_postgres_data:

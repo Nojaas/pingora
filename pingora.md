@@ -435,8 +435,8 @@ Les features sont découpées en phases pour progresser étape par étape.
 
 ### Phase 4 — Infra & Observabilité
 
-- [ ] Dockerfiles multi-stage (dev/prod)
-- [ ] `docker-compose.yml` complet avec healthchecks
+- [x] Dockerfiles multi-stage (dev/prod)
+- [x] `docker-compose.yml` complet avec healthchecks
 - [ ] Logs structurés (pino)
 - [ ] Métriques Prometheus (`/metrics`)
 - [ ] Simulation LocalStack SES
@@ -446,6 +446,7 @@ Les features sont découpées en phases pour progresser étape par étape.
 - [ ] Dashboard Next.js (liste notifs, statut queues)
 - [ ] Tanstack Query + Zustand
 - [ ] Pipeline GitHub Actions (lint → test → build → push image)
+- [ ] Faire un readme qui explique le projet brievement
 
 idée de feeature pour apres : un canal de notification "résumé intelligent" ou un endpoint qui génère du contenu
 

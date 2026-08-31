@@ -10,7 +10,7 @@
     }
   },
   "scripts": {
-    "build": "pnpm generate && tsup && cp -R src/generated dist/",
+    "build": "pnpm generate && tsup",
     "check-types": "pnpm generate && tsc --noEmit",
     "generate": "prisma generate",
     "lint": "echo \"lint: not configured yet\"",
