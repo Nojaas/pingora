@@ -43,13 +43,15 @@ CMD ["node", "dist/index.js"]
 
 FROM base AS dev
 WORKDIR /app
-COPY pnpm-lock.yaml pnpm-workspace.yaml package.json turbo.json ./
+COPY pnpm-lock.yaml pnpm-workspace.yaml package.json turbo.json tsconfig.base.json ./
 COPY apps/api/package.json apps/api/
 COPY apps/worker/package.json apps/worker/
 COPY packages/db/package.json packages/db/
 COPY packages/shared/package.json packages/shared/
-RUN pnpm install --frozen-lockfile
+RUN pnpm install --frozen-lockfile --ignore-scripts
 COPY . .
 ENV NODE_ENV=development
+ENV DATABASE_URL=postgresql://postgres:postgres@localhost:5432/pingora
+RUN pnpm db:generate
 EXPOSE 3000
 CMD ["pnpm", "--filter", "@pingora/api", "dev"]

@@ -436,7 +436,7 @@ Les features sont découpées en phases pour progresser étape par étape.
 ### Phase 4 — Infra & Observabilité
 
 - [x] Dockerfiles multi-stage (dev/prod)
-- [ ] `docker-compose.yml` complet avec healthchecks
+- [x] `docker-compose.yml` complet avec healthchecks
 - [ ] Logs structurés (pino)
 - [ ] Métriques Prometheus (`/metrics`)
 - [ ] Simulation LocalStack SES
