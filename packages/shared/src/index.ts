@@ -67,3 +67,51 @@ export {
   parseSlidingWindowRateLimitResult,
 } from "./rate-limit.js";
 export type { RateLimitDecision } from "./rate-limit.js";
+
+export {
+  WEBHOOK_SIGNATURE_HEADER,
+  WEBHOOK_SIGNATURE_SCHEME,
+  buildWebhookSignedPayload,
+  parseWebhookSignatureHeader,
+  signWebhookPayload,
+  verifyWebhookSignature,
+} from "./webhook-signature.js";
+export type {
+  SignedWebhook,
+  VerifyWebhookSignatureOptions,
+} from "./webhook-signature.js";
+
+export {
+  WEBHOOK_EVENTS,
+  createWebhookEndpointBodySchema,
+  webhookEventSchema,
+} from "./schemas/webhook.js";
+export type {
+  CreateWebhookEndpointBody,
+  WebhookEvent,
+} from "./schemas/webhook.js";
+
+export {
+  INBOUND_WEBHOOK_IDEMPOTENCY_PREFIX,
+  INBOUND_WEBHOOK_IDEMPOTENCY_TTL_SECONDS,
+  buildInboundIdempotencyKey,
+  inboundWebhookBodySchema,
+} from "./schemas/inbound-webhook.js";
+export type { InboundWebhookBody } from "./schemas/inbound-webhook.js";
+
+export {
+  WEBHOOK_DELIVERY_TIMEOUT_MS,
+  WEBHOOK_JOB_ATTEMPTS,
+  WEBHOOK_JOB_BACKOFF,
+  WEBHOOK_JOB_BACKOFF_DELAY_MS,
+  WEBHOOK_JOB_DEFAULT_OPTIONS,
+  WEBHOOK_JOB_NAME,
+  WEBHOOK_QUEUE_NAME,
+  buildWebhookEventPayload,
+  isRetryableWebhookStatus,
+  webhookJobDataSchema,
+} from "./queues/webhook.js";
+export type {
+  WebhookEventPayload,
+  WebhookJobData,
+} from "./queues/webhook.js";

@@ -118,6 +118,62 @@ vi.mock("@pingora/db", () => ({
         });
       },
     },
+    webhookEndpoint: {
+      create: async ({
+        data,
+      }: {
+        data: Omit<
+          import("./prisma-store.js").StoredWebhookEndpoint,
+          "id" | "createdAt"
+        >;
+      }) => {
+        prismaStore.webhookSeq += 1;
+        const endpoint = {
+          id: `wh_integration_${prismaStore.webhookSeq}`,
+          createdAt: new Date("2026-05-23T12:00:00.000Z"),
+          ...data,
+        };
+        prismaStore.webhookEndpoints.push(endpoint);
+        return endpoint;
+      },
+      findMany: async ({
+        where,
+        orderBy,
+      }: {
+        where: { apiKeyId: string };
+        orderBy: { createdAt: "desc" };
+      }) => {
+        const rows = prismaStore.webhookEndpoints.filter(
+          (endpoint) => endpoint.apiKeyId === where.apiKeyId,
+        );
+        return [...rows].sort((a, b) =>
+          orderBy.createdAt === "desc"
+            ? b.createdAt.getTime() - a.createdAt.getTime()
+            : a.createdAt.getTime() - b.createdAt.getTime(),
+        );
+      },
+      findFirst: async ({
+        where,
+      }: {
+        where: { id: string; apiKeyId: string };
+        select?: { id: boolean };
+      }) => {
+        const endpoint = prismaStore.webhookEndpoints.find(
+          (row) => row.id === where.id && row.apiKeyId === where.apiKeyId,
+        );
+        return endpoint ? { id: endpoint.id } : null;
+      },
+      delete: async ({ where }: { where: { id: string } }) => {
+        const index = prismaStore.webhookEndpoints.findIndex(
+          (endpoint) => endpoint.id === where.id,
+        );
+        if (index === -1) {
+          throw new Error(`Webhook endpoint ${where.id} not found`);
+        }
+        const [removed] = prismaStore.webhookEndpoints.splice(index, 1);
+        return removed;
+      },
+    },
   },
   Prisma: {},
 }));
@@ -135,6 +191,26 @@ vi.mock("../lib/rate-limit.js", async (importOriginal) => {
   };
 });
 
+export const inboundIdempotencyKeys = new Set<string>();
+
 vi.mock("../lib/redis.js", () => ({
-  getRedisClient: () => ({}),
+  getRedisClient: () => ({
+    set: async (
+      key: string,
+      _value: string,
+      _ex: string,
+      _ttl: number,
+      nx?: string,
+    ) => {
+      if (nx === "NX") {
+        if (inboundIdempotencyKeys.has(key)) {
+          return null;
+        }
+        inboundIdempotencyKeys.add(key);
+        return "OK";
+      }
+      inboundIdempotencyKeys.add(key);
+      return "OK";
+    },
+  }),
 }));
