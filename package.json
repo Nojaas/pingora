@@ -22,6 +22,10 @@
     "db:seed": "pnpm --filter @pingora/db seed",
     "infra:up": "docker compose -f infra/docker-compose.yml up -d",
     "infra:down": "docker compose -f infra/docker-compose.yml down",
+    "docker:api:prod": "docker build -f apps/api/Dockerfile --target prod -t pingora-api:prod .",
+    "docker:api:dev": "docker build -f apps/api/Dockerfile --target dev -t pingora-api:dev .",
+    "docker:worker:prod": "docker build -f apps/worker/Dockerfile --target prod -t pingora-worker:prod .",
+    "docker:worker:dev": "docker build -f apps/worker/Dockerfile --target dev -t pingora-worker:dev .",
     "postinstall": "pnpm db:generate"
   },
   "devDependencies": {

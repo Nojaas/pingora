@@ -1,0 +1,33 @@
+# Dependencies & build artifacts
+node_modules
+**/node_modules
+**/dist
+.turbo
+**/.turbo
+
+# Git & IDE
+.git
+.gitignore
+.github
+.cursor
+.vscode
+
+# Env & secrets (injected at runtime)
+.env
+.env.*
+!.env.example
+
+# Local docs & specs (not needed in images)
+specs.md
+**/*.md
+!packages/db/prisma/**
+
+# Tests & coverage
+coverage
+**/*.test.ts
+**/*.integration.test.ts
+**/vitest*.config.ts
+**/test
+
+# Infra (compose mounts separately)
+infra/localstack
