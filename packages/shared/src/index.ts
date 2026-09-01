@@ -1,4 +1,18 @@
-export const PINGORA_VERSION = "0.0.0" as const;
+export { PINGORA_VERSION } from "./version.js";
+
+export {
+  LOG_SERVICES,
+  buildLoggerOptions,
+  createFastifyLogger,
+  createLogger,
+  resolveLogLevel,
+} from "./logger.js";
+export type {
+  FastifyLoggerOption,
+  LogLevel,
+  PingoraService,
+} from "./logger.js";
+export type { Logger } from "pino";
 
 export {
   API_KEY_HEADER,

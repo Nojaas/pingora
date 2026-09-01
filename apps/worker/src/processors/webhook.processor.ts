@@ -15,6 +15,9 @@ import {
   deliverWebhookHttp,
   WebhookDeliveryError,
 } from "../providers/webhook.js";
+import { childLogger } from "../lib/logger.js";
+
+const log = childLogger("webhook");
 
 export async function processWebhookJob(job: Job) {
   const parsed = webhookJobDataSchema.safeParse(job.data);
@@ -105,11 +108,14 @@ export function startWebhookWorker() {
   });
 
   worker.on("completed", (job) => {
-    console.log(`[webhook] job ${job.id} completed`, job.returnvalue);
+    log.info(
+      { jobId: job.id, result: job.returnvalue },
+      "job completed",
+    );
   });
 
   worker.on("failed", (job, error) => {
-    console.error(`[webhook] job ${job?.id} failed`, error.message);
+    log.error({ jobId: job?.id, err: error }, "job failed");
   });
 
   return worker;

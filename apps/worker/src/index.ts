@@ -1,10 +1,10 @@
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { config } from "dotenv";
-import { PINGORA_VERSION } from "@pingora/shared";
 import { startEmailDlqWorker } from "./processors/email-dlq.processor.js";
 import { startEmailWorker } from "./processors/email.processor.js";
 import { startWebhookWorker } from "./processors/webhook.processor.js";
+import { logger } from "./lib/logger.js";
 
 const rootEnv = resolve(
   dirname(fileURLToPath(import.meta.url)),
@@ -16,12 +16,13 @@ const emailWorker = startEmailWorker();
 const emailDlqWorker = startEmailDlqWorker();
 const webhookWorker = startWebhookWorker();
 
-console.log(
-  `[pingora-worker] ready (v${PINGORA_VERSION}) — email + email-dlq + webhook queues`,
+logger.info(
+  { queues: ["email", "email-dlq", "webhook"] },
+  "worker ready",
 );
 
 async function shutdown(signal: string) {
-  console.log(`[pingora-worker] ${signal} received, closing...`);
+  logger.info({ signal }, "shutdown requested");
   await Promise.all([
     emailWorker.close(),
     emailDlqWorker.close(),

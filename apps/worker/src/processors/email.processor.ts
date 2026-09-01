@@ -13,7 +13,10 @@ import type { Job } from "bullmq";
 import { Worker } from "bullmq";
 import { dispatchNotificationWebhooks } from "../lib/dispatch-webhooks.js";
 import { moveExhaustedEmailJobToDlq } from "../lib/exhausted-job.js";
+import { childLogger } from "../lib/logger.js";
 import { sendEmail } from "../providers/email.js";
+
+const log = childLogger("email");
 
 async function processEmailJob(job: Job) {
   const parsed = emailJobDataSchema.safeParse(job.data);
@@ -107,14 +110,23 @@ async function dispatchNotificationWebhooksSafely(
   try {
     const result = await dispatchNotificationWebhooks(notificationId, event);
     if (result.enqueued > 0) {
-      console.log(
-        `[email] dispatched ${result.enqueued} webhook(s) for ${notificationId} (${event})`,
+      log.info(
+        {
+          notificationId,
+          event,
+          enqueued: result.enqueued,
+        },
+        "webhooks dispatched",
       );
     }
   } catch (error) {
-    console.error(
-      `[email] webhook dispatch failed for ${notificationId} (${event})`,
-      error instanceof Error ? error.message : error,
+    log.error(
+      {
+        notificationId,
+        event,
+        err: error instanceof Error ? error : { message: String(error) },
+      },
+      "webhook dispatch failed",
     );
   }
 }
@@ -126,12 +138,15 @@ export function startEmailWorker() {
   });
 
   worker.on("completed", (job) => {
-    console.log(`[email] job ${job.id} completed`, job.returnvalue);
+    log.info(
+      { jobId: job.id, result: job.returnvalue },
+      "job completed",
+    );
   });
 
   worker.on("failed", async (job, error) => {
     if (!job) {
-      console.error("[email] job failed", error.message);
+      log.error({ err: error }, "job failed without job context");
       return;
     }
 
@@ -141,23 +156,37 @@ export function startEmailWorker() {
     if (exhausted) {
       try {
         const dlqJobId = await moveExhaustedEmailJobToDlq(job, error);
-        console.error(
-          `[email] job ${job.id} moved to DLQ as ${dlqJobId} after ${maxAttempts} attempts`,
-          error.message,
+        log.error(
+          {
+            jobId: job.id,
+            dlqJobId,
+            attempts: maxAttempts,
+            err: error,
+          },
+          "job moved to DLQ",
         );
       } catch (dlqError) {
-        console.error(
-          `[email] job ${job.id} exhausted but DLQ enqueue failed`,
-          dlqError instanceof Error ? dlqError.message : dlqError,
+        log.error(
+          {
+            jobId: job.id,
+            err: dlqError instanceof Error ? dlqError : { message: String(dlqError) },
+          },
+          "DLQ enqueue failed after exhausted attempts",
         );
       }
       return;
     }
 
     const retryInMs = getExponentialBackoffDelayMs(job.attemptsMade);
-    console.warn(
-      `[email] job ${job.id} attempt ${job.attemptsMade}/${maxAttempts} failed, retry in ~${retryInMs}ms`,
-      error.message,
+    log.warn(
+      {
+        jobId: job.id,
+        attempt: job.attemptsMade,
+        maxAttempts,
+        retryInMs,
+        err: error,
+      },
+      "job failed, will retry",
     );
   });
 

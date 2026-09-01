@@ -1,6 +1,10 @@
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { config } from "dotenv";
+import {
+  createFastifyLogger,
+  LOG_SERVICES,
+} from "@pingora/shared";
 import Fastify from "fastify";
 import authPlugin from "./plugins/auth.js";
 import rateLimitPlugin from "./plugins/rate-limit.js";
@@ -17,7 +21,9 @@ const rootEnv = resolve(
 config({ path: rootEnv });
 
 export async function buildApp(options?: { logger?: boolean }) {
-  const app = Fastify({ logger: options?.logger ?? true });
+  const app = Fastify({
+    logger: createFastifyLogger(LOG_SERVICES.API, options?.logger ?? true),
+  });
 
   await app.register(healthRoutes);
   await app.register(authPlugin);

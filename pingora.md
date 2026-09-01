@@ -437,7 +437,7 @@ Les features sont découpées en phases pour progresser étape par étape.
 
 - [x] Dockerfiles multi-stage (dev/prod)
 - [x] `docker-compose.yml` complet avec healthchecks
-- [ ] Logs structurés (pino)
+- [x] Logs structurés (pino)
 - [ ] Métriques Prometheus (`/metrics`)
 - [ ] Simulation LocalStack SES
 
