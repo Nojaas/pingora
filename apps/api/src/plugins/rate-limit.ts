@@ -13,6 +13,10 @@ function isPublicRoute(url: string, config?: { public?: boolean }): boolean {
   return pathname === "/health";
 }
 
+function isInternalRoute(config?: { internal?: boolean }): boolean {
+  return config?.internal === true;
+}
+
 function setRateLimitHeaders(reply: FastifyReply, decision: RateLimitDecision) {
   reply.header("X-RateLimit-Limit", String(decision.limit));
   reply.header("X-RateLimit-Remaining", String(decision.remaining));
@@ -23,7 +27,11 @@ const rateLimitPlugin: FastifyPluginAsync = async (fastify) => {
   fastify.addHook("onRequest", async (request, reply) => {
     const routeConfig = request.routeOptions.config;
 
-    if (isPublicRoute(request.url, routeConfig) || !request.apiKey) {
+    if (
+      isPublicRoute(request.url, routeConfig) ||
+      isInternalRoute(routeConfig) ||
+      !request.apiKey
+    ) {
       return;
     }
 

@@ -52,6 +52,34 @@ describe("API integration — auth", () => {
     });
   });
 
+  it("GET /metrics returns 401 without credentials", async () => {
+    vi.stubEnv("METRICS_SECRET", "integration-metrics-secret");
+
+    const response = await app.inject({ method: "GET", url: "/metrics" });
+
+    expect(response.statusCode).toBe(401);
+    expect(response.json()).toMatchObject({ error: "unauthorized" });
+
+    vi.unstubAllEnvs();
+  });
+
+  it("GET /metrics returns Prometheus metrics with bearer token", async () => {
+    vi.stubEnv("METRICS_SECRET", "integration-metrics-secret");
+
+    const response = await app.inject({
+      method: "GET",
+      url: "/metrics",
+      headers: { authorization: "Bearer integration-metrics-secret" },
+    });
+
+    expect(response.statusCode).toBe(200);
+    expect(response.headers["content-type"]).toContain("text/plain");
+    expect(response.body).toContain("http_requests_total");
+    expect(response.body).toContain("process_cpu");
+
+    vi.unstubAllEnvs();
+  });
+
   it("GET /me returns 401 without api key", async () => {
     const response = await app.inject({ method: "GET", url: "/me" });
 
