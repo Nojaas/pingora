@@ -53,4 +53,28 @@ describe("emitAlert", () => {
       `[pingora:alert] ${formatAlert(alert)}`,
     );
   });
+
+  it("logs structured alert via pino when logger is provided", () => {
+    const error = vi.fn();
+    const logger = { error, warn: vi.fn() } as unknown as import("pino").Logger;
+
+    const alert = buildNotificationDlqAlert({
+      queue: "email-dlq",
+      notificationId: "notif_1",
+      jobId: "dlq-email-notif_1",
+      error: "SMTP timeout",
+      attempts: 5,
+    });
+
+    emitAlert(alert, logger);
+
+    expect(error).toHaveBeenCalledWith(
+      expect.objectContaining({
+        alert: true,
+        type: ALERT_TYPES.NOTIFICATION_DLQ,
+        notificationId: "notif_1",
+      }),
+      "pingora alert",
+    );
+  });
 });

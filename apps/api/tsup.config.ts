@@ -12,6 +12,7 @@ export default defineConfig({
     "@prisma/client",
     "bullmq",
     "ioredis",
+    "@prometheus-io/client",
     "pg",
   ],
 });

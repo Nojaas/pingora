@@ -38,7 +38,24 @@ export function formatAlert(alert: AlertPayload): string {
   return JSON.stringify(alert);
 }
 
-export function emitAlert(alert: AlertPayload): void {
+import type { Logger } from "pino";
+
+export function emitAlert(alert: AlertPayload, logger?: Logger): void {
+  const payload = {
+    alert: true as const,
+    ...alert,
+  };
+
+  if (logger) {
+    if (alert.level === "error") {
+      logger.error(payload, "pingora alert");
+      return;
+    }
+
+    logger.warn(payload, "pingora alert");
+    return;
+  }
+
   const line = `[pingora:alert] ${formatAlert(alert)}`;
 
   if (alert.level === "error") {

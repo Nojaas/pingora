@@ -10,12 +10,17 @@ x-app-environment: &app-environment
   REDIS_URL: redis://redis:6379
   RATE_LIMIT_WINDOW_MS: "60000"
   ADMIN_SECRET: change_me_in_prod
+  METRICS_SECRET: metrics_dev_change_me
   INBOUND_WEBHOOK_SECRET: whsec_dev_inbound_change_me
   EMAIL_PROVIDER: nodemailer
   SMTP_HOST: mailpit
   SMTP_PORT: "1025"
   SMTP_FROM: pingora@localhost
   SMS_PROVIDER: mock
+  AWS_ENDPOINT: http://localstack:4566
+  AWS_REGION: eu-west-1
+  AWS_ACCESS_KEY_ID: test
+  AWS_SECRET_ACCESS_KEY: test
 
 services:
   postgres:
@@ -60,6 +65,31 @@ services:
       timeout: 5s
       retries: 5
       start_period: 10s
+
+  localstack:
+    image: localstack/localstack:4
+    restart: unless-stopped
+    ports:
+      - "4566:4566"
+    environment:
+      SERVICES: ses
+      DEBUG: "0"
+      AWS_DEFAULT_REGION: eu-west-1
+      SES_FROM_EMAIL: pingora@localhost
+      # SMTP_HOST is Pro-only for SES→SMTP relay; Community uses /_aws/ses
+      SMTP_HOST: mailpit:1025
+    volumes:
+      - ./localstack/init-ses.sh:/etc/localstack/init/ready.d/init-ses.sh:ro
+      - pingora_localstack_data:/var/lib/localstack
+    depends_on:
+      mailpit:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:4566/_localstack/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
 
   migrate:
     profiles: ["app"]
@@ -127,3 +157,4 @@ services:
 
 volumes:
   pingora_postgres_data:
+  pingora_localstack_data:
