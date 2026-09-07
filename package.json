@@ -10,6 +10,7 @@
     "build": "turbo build",
     "check-types": "turbo check-types",
     "dev": "turbo dev --filter=@pingora/api --filter=@pingora/worker",
+    "dev:dashboard": "turbo dev --filter=@pingora/dashboard",
     "dev:all": "turbo dev",
     "lint": "turbo lint",
     "test": "turbo test",

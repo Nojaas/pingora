@@ -117,10 +117,13 @@ Auth : header `x-api-key` (sauf routes publiques / internes).
 | ------- | ----- | ----- |
 | `GET` | `/health` | Public |
 | `GET` | `/metrics` | Interne — Bearer / `x-metrics-token` |
+| `GET` | `/queues` | Compteurs BullMQ (email, email-dlq, webhook) |
 | `POST` | `/notifications` | Enqueue email (scopes) |
 | `GET` | `/notifications` | Cursor pagination |
 | `POST/GET/DELETE` | `/webhooks/endpoints` | CRUD endpoints sortants |
 | `POST` | `/webhooks/inbound` | Public + HMAC + idempotence |
+
+Dashboard : `pnpm dev:dashboard` → http://localhost:3002 (nécessite `PINGORA_API_KEY` dans `.env`).
 
 Détail des contrats et variables : [`.env.example`](./.env.example).
 
@@ -162,4 +165,4 @@ pnpm build
 ## Statut
 
 Phases 1–4 livrées (API + worker email, retry/DLQ, webhooks, Docker, logs, métriques, LocalStack SES).  
-Phase 5 : dashboard Next.js + CI/CD.
+Phase 5 en cours : dashboard Next.js (liste + queues) ; TanStack Query / Zustand et CI/CD ensuite.

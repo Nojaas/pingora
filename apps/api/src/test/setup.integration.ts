@@ -182,6 +182,44 @@ vi.mock("../queues/email.queue.js", () => ({
   enqueueEmailNotification: (...args: [string]) => mockEnqueueEmail(...args),
 }));
 
+vi.mock("../services/queue.service.js", () => ({
+  getQueuesStatus: async () => [
+    {
+      name: "email",
+      counts: {
+        waiting: 1,
+        active: 0,
+        completed: 10,
+        failed: 0,
+        delayed: 0,
+        paused: 0,
+      },
+    },
+    {
+      name: "email-dlq",
+      counts: {
+        waiting: 0,
+        active: 0,
+        completed: 2,
+        failed: 0,
+        delayed: 0,
+        paused: 0,
+      },
+    },
+    {
+      name: "webhook",
+      counts: {
+        waiting: 3,
+        active: 1,
+        completed: 5,
+        failed: 1,
+        delayed: 0,
+        paused: 0,
+      },
+    },
+  ],
+}));
+
 vi.mock("../lib/rate-limit.js", async (importOriginal) => {
   const actual =
     await importOriginal<typeof import("../lib/rate-limit.js")>();

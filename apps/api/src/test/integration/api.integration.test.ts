@@ -240,6 +240,28 @@ describe("API integration — notifications", () => {
     expect(prismaStore.notifications[0]?.status).toBe("QUEUED");
   });
 
+  it("GET /queues returns BullMQ job counts", async () => {
+    const response = await app.inject({
+      method: "GET",
+      url: "/queues",
+      headers: authHeader(API_KEYS.full.raw),
+    });
+
+    expect(response.statusCode).toBe(200);
+    expect(response.json()).toMatchObject({
+      data: [
+        { name: "email", counts: { waiting: 1, completed: 10 } },
+        { name: "email-dlq", counts: { completed: 2 } },
+        { name: "webhook", counts: { waiting: 3, active: 1, failed: 1 } },
+      ],
+    });
+  });
+
+  it("GET /queues returns 401 without api key", async () => {
+    const response = await app.inject({ method: "GET", url: "/queues" });
+    expect(response.statusCode).toBe(401);
+  });
+
   it("GET /notifications lists notifications for the authenticated api key", async () => {
     prismaStore.notifications.push(
       {
