@@ -1,10 +1,13 @@
 import { API_KEY_HEADER } from "@pingora/shared";
 import { getDashboardApiConfig } from "./env";
 import type {
+  DashboardSummaryResponse,
   NotificationChannel,
   NotificationStatus,
   NotificationsListResponse,
   QueuesResponse,
+  WebhookDeliveriesListResponse,
+  WebhookDeliveryStatus,
 } from "./types";
 
 export class DashboardApiError extends Error {
@@ -51,6 +54,11 @@ export type FetchNotificationsParams = {
   channel?: NotificationChannel;
 };
 
+export type FetchWebhookDeliveriesParams = {
+  limit?: number;
+  status?: WebhookDeliveryStatus;
+};
+
 export function fetchNotifications(params: FetchNotificationsParams = {}) {
   const search = new URLSearchParams();
   search.set("limit", String(params.limit ?? 25));
@@ -61,4 +69,21 @@ export function fetchNotifications(params: FetchNotificationsParams = {}) {
 
 export function fetchQueues() {
   return apiFetch<QueuesResponse>("/queues");
+}
+
+export function fetchWebhookDeliveries(
+  params: FetchWebhookDeliveriesParams = {},
+) {
+  const search = new URLSearchParams();
+  search.set("limit", String(params.limit ?? 25));
+  if (params.status) search.set("status", params.status);
+  return apiFetch<WebhookDeliveriesListResponse>(
+    `/webhooks/deliveries?${search}`,
+  );
+}
+
+export function fetchDashboardSummary(windowHours = 24) {
+  const search = new URLSearchParams();
+  search.set("windowHours", String(windowHours));
+  return apiFetch<DashboardSummaryResponse>(`/dashboard/summary?${search}`);
 }

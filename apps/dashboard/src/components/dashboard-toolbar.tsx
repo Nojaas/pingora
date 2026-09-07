@@ -4,7 +4,11 @@ import {
   useDashboardUi,
   type RefreshIntervalMs,
 } from "../store/dashboard-ui";
-import type { NotificationChannel, NotificationStatus } from "../lib/types";
+import type {
+  NotificationChannel,
+  NotificationStatus,
+  WebhookDeliveryStatus,
+} from "../lib/types";
 
 const STATUS_OPTIONS: Array<NotificationStatus | "all"> = [
   "all",
@@ -20,6 +24,14 @@ const CHANNEL_OPTIONS: Array<NotificationChannel | "all"> = [
   "email",
   "sms",
   "push",
+];
+
+const DELIVERY_STATUS_OPTIONS: Array<WebhookDeliveryStatus | "all"> = [
+  "all",
+  "success",
+  "failed",
+  "pending",
+  "retrying",
 ];
 
 const REFRESH_OPTIONS: Array<{ value: RefreshIntervalMs; label: string }> = [
@@ -38,9 +50,11 @@ export function DashboardToolbar({
 }) {
   const status = useDashboardUi((state) => state.status);
   const channel = useDashboardUi((state) => state.channel);
+  const deliveryStatus = useDashboardUi((state) => state.deliveryStatus);
   const refreshIntervalMs = useDashboardUi((state) => state.refreshIntervalMs);
   const setStatus = useDashboardUi((state) => state.setStatus);
   const setChannel = useDashboardUi((state) => state.setChannel);
+  const setDeliveryStatus = useDashboardUi((state) => state.setDeliveryStatus);
   const setRefreshIntervalMs = useDashboardUi(
     (state) => state.setRefreshIntervalMs,
   );
@@ -48,7 +62,7 @@ export function DashboardToolbar({
   return (
     <section className="toolbar" aria-label="Filtres dashboard">
       <label className="field">
-        <span>Status</span>
+        <span>Notif status</span>
         <select
           value={status}
           onChange={(event) =>
@@ -72,6 +86,24 @@ export function DashboardToolbar({
           }
         >
           {CHANNEL_OPTIONS.map((option) => (
+            <option key={option} value={option}>
+              {option === "all" ? "tous" : option}
+            </option>
+          ))}
+        </select>
+      </label>
+
+      <label className="field">
+        <span>Webhook status</span>
+        <select
+          value={deliveryStatus}
+          onChange={(event) =>
+            setDeliveryStatus(
+              event.target.value as WebhookDeliveryStatus | "all",
+            )
+          }
+        >
+          {DELIVERY_STATUS_OPTIONS.map((option) => (
             <option key={option} value={option}>
               {option === "all" ? "tous" : option}
             </option>

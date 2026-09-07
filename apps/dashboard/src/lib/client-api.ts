@@ -1,7 +1,13 @@
 import type {
   FetchNotificationsParams,
+  FetchWebhookDeliveriesParams,
 } from "./api";
-import type { NotificationsListResponse, QueuesResponse } from "./types";
+import type {
+  DashboardSummaryResponse,
+  NotificationsListResponse,
+  QueuesResponse,
+  WebhookDeliveriesListResponse,
+} from "./types";
 
 export class ClientApiError extends Error {
   constructor(
@@ -43,4 +49,21 @@ export function fetchNotificationsClient(params: FetchNotificationsParams = {}) 
 
 export function fetchQueuesClient() {
   return bffFetch<QueuesResponse>("/api/queues");
+}
+
+export function fetchWebhookDeliveriesClient(
+  params: FetchWebhookDeliveriesParams = {},
+) {
+  const search = new URLSearchParams();
+  search.set("limit", String(params.limit ?? 25));
+  if (params.status) search.set("status", params.status);
+  return bffFetch<WebhookDeliveriesListResponse>(
+    `/api/webhook-deliveries?${search}`,
+  );
+}
+
+export function fetchDashboardSummaryClient(windowHours = 24) {
+  const search = new URLSearchParams();
+  search.set("windowHours", String(windowHours));
+  return bffFetch<DashboardSummaryResponse>(`/api/dashboard-summary?${search}`);
 }
