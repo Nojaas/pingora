@@ -98,12 +98,20 @@ export type {
 export {
   WEBHOOK_EVENTS,
   createWebhookEndpointBodySchema,
+  deriveWebhookDeliveryStatus,
+  listWebhookDeliveriesQuerySchema,
+  webhookDeliveryStatusSchema,
   webhookEventSchema,
 } from "./schemas/webhook.js";
 export type {
   CreateWebhookEndpointBody,
+  ListWebhookDeliveriesQuery,
+  WebhookDeliveryStatus,
   WebhookEvent,
 } from "./schemas/webhook.js";
+
+export { dashboardSummaryQuerySchema } from "./schemas/dashboard.js";
+export type { DashboardSummaryQuery } from "./schemas/dashboard.js";
 
 export {
   INBOUND_WEBHOOK_IDEMPOTENCY_PREFIX,

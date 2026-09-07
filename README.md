@@ -42,7 +42,7 @@ Client ──x-api-key──► API (Fastify)
 apps/
   api/          # REST — auth API key, rate limit, routes métier
   worker/       # Consumers BullMQ (email, DLQ, webhook)
-  dashboard/    # Next.js (stub — Phase 5)
+  dashboard/    # Next.js monitoring (TanStack Query + Zustand)
 packages/
   db/           # Prisma schema, migrations, client
   shared/       # Schémas Zod, queues, HMAC, logger
@@ -117,10 +117,15 @@ Auth : header `x-api-key` (sauf routes publiques / internes).
 | ------- | ----- | ----- |
 | `GET` | `/health` | Public |
 | `GET` | `/metrics` | Interne — Bearer / `x-metrics-token` |
+| `GET` | `/queues` | Compteurs BullMQ (email, email-dlq, webhook) |
+| `GET` | `/dashboard/summary` | KPIs (succès, latence, DLQ) |
 | `POST` | `/notifications` | Enqueue email (scopes) |
 | `GET` | `/notifications` | Cursor pagination |
+| `GET` | `/webhooks/deliveries` | Historique deliveries (succès / retry / échec) |
 | `POST/GET/DELETE` | `/webhooks/endpoints` | CRUD endpoints sortants |
 | `POST` | `/webhooks/inbound` | Public + HMAC + idempotence |
+
+Dashboard : `pnpm dev:dashboard` → http://localhost:3002 (nécessite `PINGORA_API_KEY` dans `.env`).
 
 Détail des contrats et variables : [`.env.example`](./.env.example).
 
@@ -137,6 +142,7 @@ pnpm build
 
 - Unitaires : Vitest (shared, api services, worker processors)
 - Intégration : Fastify `inject` (auth, notifications, webhooks, metrics)
+- CI : [`.github/workflows/ci.yml`](./.github/workflows/ci.yml) — lint → test → build → images GHCR (`pingora-api`, `pingora-worker`) sur push `main`/`develop`
 
 ---
 
@@ -161,5 +167,5 @@ pnpm build
 
 ## Statut
 
-Phases 1–4 livrées (API + worker email, retry/DLQ, webhooks, Docker, logs, métriques, LocalStack SES).  
-Phase 5 : dashboard Next.js + CI/CD.
+Phases 1–5 livrées (API + worker, webhooks, Docker, observabilité, dashboard monitoring, CI/CD GHCR).
+

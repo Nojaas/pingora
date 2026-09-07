@@ -240,6 +240,105 @@ describe("API integration — notifications", () => {
     expect(prismaStore.notifications[0]?.status).toBe("QUEUED");
   });
 
+  it("GET /queues returns BullMQ job counts", async () => {
+    const response = await app.inject({
+      method: "GET",
+      url: "/queues",
+      headers: authHeader(API_KEYS.full.raw),
+    });
+
+    expect(response.statusCode).toBe(200);
+    expect(response.json()).toMatchObject({
+      data: [
+        { name: "email", counts: { waiting: 1, completed: 10 } },
+        { name: "email-dlq", counts: { waiting: 2, active: 1, delayed: 1 } },
+        { name: "webhook", counts: { waiting: 3, active: 1, failed: 1 } },
+      ],
+    });
+  });
+
+  it("GET /dashboard/summary returns KPIs for the api key", async () => {
+    const now = Date.now();
+    const createdAt = new Date(now - 60_000);
+    const sentAt = new Date(now - 58_000);
+    const deliveredAt = new Date(now - 59_000);
+
+    prismaStore.notifications.push(
+      {
+        id: "notif_summary_sent",
+        apiKeyId: API_KEYS.full.id,
+        channel: "EMAIL",
+        recipient: "a@example.com",
+        subject: "Hi",
+        body: "Body",
+        status: "SENT",
+        sentAt,
+        createdAt,
+      },
+      {
+        id: "notif_summary_failed",
+        apiKeyId: API_KEYS.full.id,
+        channel: "EMAIL",
+        recipient: "b@example.com",
+        subject: "Hi",
+        body: "Body",
+        status: "FAILED",
+        createdAt,
+      },
+    );
+    prismaStore.webhookEndpoints.push({
+      id: "wh_summary",
+      apiKeyId: API_KEYS.full.id,
+      url: "https://example.com/hooks",
+      secret: "whsec_test_secret_16",
+      events: ["notification.sent"],
+      active: true,
+      createdAt,
+    });
+    prismaStore.webhookDeliveries.push({
+      id: "del_summary_ok",
+      endpointId: "wh_summary",
+      notificationId: "notif_summary_sent",
+      event: "notification.sent",
+      statusCode: 200,
+      attempts: 1,
+      nextRetryAt: null,
+      deliveredAt,
+      createdAt,
+    });
+
+    const response = await app.inject({
+      method: "GET",
+      url: "/dashboard/summary?windowHours=24",
+      headers: authHeader(API_KEYS.full.raw),
+    });
+
+    expect(response.statusCode).toBe(200);
+    expect(response.json()).toMatchObject({
+      notifications: {
+        successRate: 0.5,
+        sent: 1,
+        failed: 1,
+        averageLatencyMs: 2000,
+      },
+      webhooks: {
+        successRate: 1,
+        delivered: 1,
+        failed: 0,
+        averageLatencyMs: 1000,
+      },
+      dlq: {
+        queue: "email-dlq",
+        count: 4,
+      },
+    });
+  });
+
+  it("GET /queues returns 401 without api key", async () => {
+    const response = await app.inject({ method: "GET", url: "/queues" });
+    expect(response.statusCode).toBe(401);
+  });
+
   it("GET /notifications lists notifications for the authenticated api key", async () => {
     prismaStore.notifications.push(
       {
@@ -476,6 +575,65 @@ describe("API integration — webhooks", () => {
       ],
     });
     expect(response.json().data[0]).not.toHaveProperty("secret");
+  });
+
+  it("GET /webhooks/deliveries lists deliveries with derived status", async () => {
+    prismaStore.webhookEndpoints.push({
+      id: "wh_delivery",
+      apiKeyId: API_KEYS.full.id,
+      url: webhookPayload.url,
+      secret: webhookPayload.secret,
+      events: ["notification.sent", "notification.failed"],
+      active: true,
+      createdAt: new Date("2026-05-23T12:00:00.000Z"),
+    });
+    prismaStore.webhookDeliveries.push(
+      {
+        id: "del_ok",
+        endpointId: "wh_delivery",
+        notificationId: "notif_1",
+        event: "notification.sent",
+        statusCode: 200,
+        attempts: 1,
+        nextRetryAt: null,
+        deliveredAt: new Date("2026-05-23T12:00:01.500Z"),
+        createdAt: new Date("2026-05-23T12:00:00.000Z"),
+      },
+      {
+        id: "del_retry",
+        endpointId: "wh_delivery",
+        notificationId: "notif_2",
+        event: "notification.failed",
+        statusCode: 503,
+        attempts: 1,
+        nextRetryAt: new Date("2026-05-23T12:01:00.000Z"),
+        deliveredAt: null,
+        createdAt: new Date("2026-05-23T12:00:00.000Z"),
+      },
+    );
+
+    const response = await app.inject({
+      method: "GET",
+      url: "/webhooks/deliveries?limit=10",
+      headers: authHeader(API_KEYS.full.raw),
+    });
+
+    expect(response.statusCode).toBe(200);
+    expect(response.json()).toMatchObject({
+      data: [
+        expect.objectContaining({
+          id: "del_retry",
+          status: "retrying",
+          attempts: 1,
+        }),
+        expect.objectContaining({
+          id: "del_ok",
+          status: "success",
+          latencyMs: 1500,
+        }),
+      ],
+      pagination: { hasMore: false, nextCursor: null },
+    });
   });
 
   it("DELETE /webhooks/endpoints/:id removes owned endpoints", async () => {

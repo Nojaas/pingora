@@ -12,6 +12,8 @@ import healthRoutes from "./routes/health.js";
 import metricsRoutes from "./routes/metrics.js";
 import meRoutes from "./routes/me.js";
 import notificationsRoutes from "./routes/notifications.js";
+import queuesRoutes from "./routes/queues.js";
+import dashboardRoutes from "./routes/dashboard.js";
 import webhooksRoutes from "./routes/webhooks.js";
 import inboundWebhooksRoutes from "./routes/inbound-webhooks.js";
 import metricsPlugin from "./plugins/metrics.js";
@@ -34,6 +36,8 @@ export async function buildApp(options?: { logger?: boolean }) {
   await app.register(rateLimitPlugin);
   await app.register(meRoutes);
   await app.register(notificationsRoutes);
+  await app.register(queuesRoutes);
+  await app.register(dashboardRoutes);
   await app.register(webhooksRoutes);
   await app.register(inboundWebhooksRoutes);
 
