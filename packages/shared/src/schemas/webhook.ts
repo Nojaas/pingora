@@ -12,6 +12,15 @@ export const webhookEventSchema = z.enum([
   WEBHOOK_EVENTS.NOTIFICATION_FAILED,
 ]);
 
+export const webhookDeliveryStatusSchema = z.enum([
+  "success",
+  "failed",
+  "pending",
+  "retrying",
+]);
+
+export type WebhookDeliveryStatus = z.infer<typeof webhookDeliveryStatusSchema>;
+
 export const createWebhookEndpointBodySchema = z.object({
   url: z.string().url("url must be a valid URL"),
   secret: z
@@ -31,3 +40,32 @@ export const createWebhookEndpointBodySchema = z.object({
 export type CreateWebhookEndpointBody = z.infer<
   typeof createWebhookEndpointBodySchema
 >;
+
+export const listWebhookDeliveriesQuerySchema = z.object({
+  cursor: z.string().trim().min(1).optional(),
+  limit: z.coerce.number().int().min(1).max(100).default(20),
+  status: webhookDeliveryStatusSchema.optional(),
+  endpointId: z.string().trim().min(1).optional(),
+  event: webhookEventSchema.optional(),
+});
+
+export type ListWebhookDeliveriesQuery = z.infer<
+  typeof listWebhookDeliveriesQuerySchema
+>;
+
+export function deriveWebhookDeliveryStatus(input: {
+  deliveredAt: Date | string | null;
+  nextRetryAt: Date | string | null;
+  attempts: number;
+}): WebhookDeliveryStatus {
+  if (input.deliveredAt) {
+    return "success";
+  }
+  if (input.nextRetryAt) {
+    return "retrying";
+  }
+  if (input.attempts > 0) {
+    return "failed";
+  }
+  return "pending";
+}

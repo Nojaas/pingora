@@ -21,6 +21,8 @@ export type StoredNotification = {
   status: "PENDING" | "QUEUED" | "SENT" | "FAILED" | "CANCELLED";
   metadata?: unknown;
   jobId?: string | null;
+  sentAt?: Date | null;
+  failedAt?: Date | null;
   createdAt: Date;
 };
 
@@ -31,6 +33,18 @@ export type StoredWebhookEndpoint = {
   secret: string;
   events: string[];
   active: boolean;
+  createdAt: Date;
+};
+
+export type StoredWebhookDelivery = {
+  id: string;
+  endpointId: string;
+  notificationId: string;
+  event: string;
+  statusCode: number | null;
+  attempts: number;
+  nextRetryAt: Date | null;
+  deliveredAt: Date | null;
   createdAt: Date;
 };
 
@@ -75,16 +89,20 @@ export const prismaStore = {
   apiKeys: [] as StoredApiKey[],
   notifications: [] as StoredNotification[],
   webhookEndpoints: [] as StoredWebhookEndpoint[],
+  webhookDeliveries: [] as StoredWebhookDelivery[],
   notificationSeq: 0,
   webhookSeq: 0,
+  deliverySeq: 0,
 };
 
 export function resetPrismaStore() {
   prismaStore.apiKeys = [];
   prismaStore.notifications = [];
   prismaStore.webhookEndpoints = [];
+  prismaStore.webhookDeliveries = [];
   prismaStore.notificationSeq = 0;
   prismaStore.webhookSeq = 0;
+  prismaStore.deliverySeq = 0;
 }
 
 export function seedIntegrationApiKeys() {

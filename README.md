@@ -118,8 +118,10 @@ Auth : header `x-api-key` (sauf routes publiques / internes).
 | `GET` | `/health` | Public |
 | `GET` | `/metrics` | Interne — Bearer / `x-metrics-token` |
 | `GET` | `/queues` | Compteurs BullMQ (email, email-dlq, webhook) |
+| `GET` | `/dashboard/summary` | KPIs (succès, latence, DLQ) |
 | `POST` | `/notifications` | Enqueue email (scopes) |
 | `GET` | `/notifications` | Cursor pagination |
+| `GET` | `/webhooks/deliveries` | Historique deliveries (succès / retry / échec) |
 | `POST/GET/DELETE` | `/webhooks/endpoints` | CRUD endpoints sortants |
 | `POST` | `/webhooks/inbound` | Public + HMAC + idempotence |
 

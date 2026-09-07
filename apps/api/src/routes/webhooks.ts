@@ -1,6 +1,7 @@
 import {
   createWebhookEndpointBodySchema,
   formatZodError,
+  listWebhookDeliveriesQuerySchema,
   SCOPES,
 } from "@pingora/shared";
 import type { FastifyPluginAsync } from "fastify";
@@ -8,6 +9,7 @@ import { requireScopes } from "../plugins/auth.js";
 import {
   createWebhookEndpoint,
   deleteWebhookEndpoint,
+  listWebhookDeliveries,
   listWebhookEndpoints,
 } from "../services/webhook.service.js";
 
@@ -19,6 +21,22 @@ const webhooksRoutes: FastifyPluginAsync = async (fastify) => {
     },
     async (request) => {
       return listWebhookEndpoints(request.apiKey!.id);
+    },
+  );
+
+  fastify.get(
+    "/webhooks/deliveries",
+    {
+      preHandler: requireScopes(SCOPES.WEBHOOKS_READ),
+    },
+    async (request, reply) => {
+      const parsed = listWebhookDeliveriesQuerySchema.safeParse(request.query);
+
+      if (!parsed.success) {
+        return reply.code(400).send(formatZodError(parsed.error));
+      }
+
+      return listWebhookDeliveries(request.apiKey!.id, parsed.data);
     },
   );
 
