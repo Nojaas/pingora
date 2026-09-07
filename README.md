@@ -140,6 +140,7 @@ pnpm build
 
 - Unitaires : Vitest (shared, api services, worker processors)
 - Intégration : Fastify `inject` (auth, notifications, webhooks, metrics)
+- CI : [`.github/workflows/ci.yml`](./.github/workflows/ci.yml) — lint → test → build → images GHCR (`pingora-api`, `pingora-worker`) sur push `main`/`develop`
 
 ---
 
@@ -164,5 +165,5 @@ pnpm build
 
 ## Statut
 
-Phases 1–4 livrées (API + worker email, retry/DLQ, webhooks, Docker, logs, métriques, LocalStack SES).  
-Phase 5 en cours : dashboard Next.js (liste + queues, TanStack Query / Zustand) ; CI/CD ensuite.
+Phases 1–5 livrées (API + worker, webhooks, Docker, observabilité, dashboard monitoring, CI/CD GHCR).
+
