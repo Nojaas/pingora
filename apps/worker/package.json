@@ -13,6 +13,7 @@
     "test:unit": "vitest run"
   },
   "dependencies": {
+    "@aws-sdk/client-ses": "^3.1126.0",
     "@pingora/db": "workspace:*",
     "@pingora/shared": "workspace:*",
     "bullmq": "^5.56.0",

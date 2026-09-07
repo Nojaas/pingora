@@ -10,6 +10,7 @@ export default defineConfig({
     "@pingora/shared",
     "@prisma/adapter-pg",
     "@prisma/client",
+    "@aws-sdk/client-ses",
     "bullmq",
     "ioredis",
     "nodemailer",

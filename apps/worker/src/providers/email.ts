@@ -1,10 +1,9 @@
 import nodemailer from "nodemailer";
+import { resolveEmailProvider, type SendEmailInput } from "./types.js";
+import { sendEmailViaSes } from "./ses.js";
 
-export type SendEmailInput = {
-  to: string;
-  subject: string;
-  body: string;
-};
+export type { SendEmailInput } from "./types.js";
+export { resolveEmailProvider } from "./types.js";
 
 function createTransporter() {
   const host = process.env.SMTP_HOST ?? "localhost";
@@ -17,9 +16,8 @@ function createTransporter() {
   });
 }
 
-export async function sendEmail(input: SendEmailInput) {
+async function sendEmailViaNodemailer(input: SendEmailInput): Promise<string> {
   const from = process.env.SMTP_FROM ?? "pingora@localhost";
-
   const transporter = createTransporter();
 
   const info = await transporter.sendMail({
@@ -30,4 +28,14 @@ export async function sendEmail(input: SendEmailInput) {
   });
 
   return info.messageId;
+}
+
+export async function sendEmail(input: SendEmailInput): Promise<string> {
+  const provider = resolveEmailProvider();
+
+  if (provider === "ses") {
+    return sendEmailViaSes(input);
+  }
+
+  return sendEmailViaNodemailer(input);
 }

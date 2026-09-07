@@ -28,7 +28,7 @@ describe("isFinalJobAttempt", () => {
     expect(isFinalJobAttempt(4, EMAIL_JOB_ATTEMPTS)).toBe(true);
   });
 
-  it("matches pingora.md max 5 attempts", () => {
+  it("matches configured max 5 attempts", () => {
     expect(EMAIL_JOB_ATTEMPTS).toBe(5);
     expect(EMAIL_JOB_BACKOFF_DELAY_MS).toBe(1_000);
   });
