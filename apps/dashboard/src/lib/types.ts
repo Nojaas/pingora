@@ -1,3 +1,12 @@
+export type NotificationStatus =
+  | "pending"
+  | "queued"
+  | "sent"
+  | "failed"
+  | "cancelled";
+
+export type NotificationChannel = "email" | "sms" | "push";
+
 export type NotificationItem = {
   id: string;
   status: string;

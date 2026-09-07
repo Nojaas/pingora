@@ -1,6 +1,11 @@
 import { API_KEY_HEADER } from "@pingora/shared";
 import { getDashboardApiConfig } from "./env";
-import type { NotificationsListResponse, QueuesResponse } from "./types";
+import type {
+  NotificationChannel,
+  NotificationStatus,
+  NotificationsListResponse,
+  QueuesResponse,
+} from "./types";
 
 export class DashboardApiError extends Error {
   constructor(
@@ -40,8 +45,18 @@ async function apiFetch<T>(path: string): Promise<T> {
   return (await response.json()) as T;
 }
 
-export function fetchNotifications(limit = 25) {
-  return apiFetch<NotificationsListResponse>(`/notifications?limit=${limit}`);
+export type FetchNotificationsParams = {
+  limit?: number;
+  status?: NotificationStatus;
+  channel?: NotificationChannel;
+};
+
+export function fetchNotifications(params: FetchNotificationsParams = {}) {
+  const search = new URLSearchParams();
+  search.set("limit", String(params.limit ?? 25));
+  if (params.status) search.set("status", params.status);
+  if (params.channel) search.set("channel", params.channel);
+  return apiFetch<NotificationsListResponse>(`/notifications?${search}`);
 }
 
 export function fetchQueues() {

@@ -42,7 +42,7 @@ Client ──x-api-key──► API (Fastify)
 apps/
   api/          # REST — auth API key, rate limit, routes métier
   worker/       # Consumers BullMQ (email, DLQ, webhook)
-  dashboard/    # Next.js (stub — Phase 5)
+  dashboard/    # Next.js monitoring (TanStack Query + Zustand)
 packages/
   db/           # Prisma schema, migrations, client
   shared/       # Schémas Zod, queues, HMAC, logger
@@ -165,4 +165,4 @@ pnpm build
 ## Statut
 
 Phases 1–4 livrées (API + worker email, retry/DLQ, webhooks, Docker, logs, métriques, LocalStack SES).  
-Phase 5 en cours : dashboard Next.js (liste + queues) ; TanStack Query / Zustand et CI/CD ensuite.
+Phase 5 en cours : dashboard Next.js (liste + queues, TanStack Query / Zustand) ; CI/CD ensuite.
