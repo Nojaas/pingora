@@ -10,8 +10,8 @@
     }
   },
   "scripts": {
-    "build": "pnpm generate && tsup",
-    "check-types": "pnpm generate && tsc --noEmit",
+    "build": "tsup",
+    "check-types": "tsc -p tsconfig.build.json --noEmit",
     "generate": "prisma generate",
     "lint": "biome check .",
     "migrate": "dotenv -e ../../.env -- prisma migrate dev",
