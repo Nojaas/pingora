@@ -1,5 +1,5 @@
-import { vi } from "vitest";
 import type { RateLimitDecision } from "@pingora/shared";
+import { vi } from "vitest";
 import { prismaStore } from "./prisma-store.js";
 
 export const mockEnqueueEmail = vi.fn(
@@ -18,11 +18,7 @@ export const mockCheckRateLimit = vi.fn(
 vi.mock("@pingora/db", () => ({
   prisma: {
     apiKey: {
-      findUnique: async ({
-        where,
-      }: {
-        where: { keyHash: string };
-      }) => {
+      findUnique: async ({ where }: { where: { keyHash: string } }) => {
         const record = prismaStore.apiKeys.find(
           (key) => key.keyHash === where.keyHash,
         );
@@ -275,7 +271,9 @@ vi.mock("@pingora/db", () => ({
           rows = rows.filter((delivery) => delivery.nextRetryAt != null);
         }
         if (typeof where.attempts === "number") {
-          rows = rows.filter((delivery) => delivery.attempts === where.attempts);
+          rows = rows.filter(
+            (delivery) => delivery.attempts === where.attempts,
+          );
         } else if (
           where.attempts &&
           typeof where.attempts === "object" &&
@@ -393,8 +391,7 @@ vi.mock("../services/queue.service.js", () => ({
 }));
 
 vi.mock("../lib/rate-limit.js", async (importOriginal) => {
-  const actual =
-    await importOriginal<typeof import("../lib/rate-limit.js")>();
+  const actual = await importOriginal<typeof import("../lib/rate-limit.js")>();
   return {
     ...actual,
     checkSlidingWindowRateLimit: () => mockCheckRateLimit(),

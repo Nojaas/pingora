@@ -1,19 +1,19 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
 import { PINGORA_VERSION } from "@pingora/shared";
+import { useQuery } from "@tanstack/react-query";
 import {
   fetchDashboardSummaryClient,
   fetchNotificationsClient,
   fetchQueuesClient,
   fetchWebhookDeliveriesClient,
 } from "../lib/client-api";
+import { useDashboardUi } from "../store/dashboard-ui";
+import { DashboardToolbar } from "./dashboard-toolbar";
+import { MetricsPanel } from "./metrics-panel";
 import { NotificationsTable } from "./notifications-table";
 import { QueuesPanel } from "./queues-panel";
-import { MetricsPanel } from "./metrics-panel";
 import { WebhookDeliveriesTable } from "./webhook-deliveries-table";
-import { DashboardToolbar } from "./dashboard-toolbar";
-import { useDashboardUi } from "../store/dashboard-ui";
 
 export function DashboardHome() {
   const status = useDashboardUi((state) => state.status);
@@ -118,7 +118,9 @@ export function DashboardHome() {
         </section>
       ) : (
         <>
-          {summaryQuery.data ? <MetricsPanel summary={summaryQuery.data} /> : null}
+          {summaryQuery.data ? (
+            <MetricsPanel summary={summaryQuery.data} />
+          ) : null}
           <QueuesPanel queues={queuesQuery.data?.data ?? []} />
           <NotificationsTable
             notifications={notificationsQuery.data?.data ?? []}

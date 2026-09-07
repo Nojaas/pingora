@@ -1,4 +1,4 @@
-import { prisma, type Prisma } from "@pingora/db";
+import { type Prisma, prisma } from "@pingora/db";
 import type {
   CreateWebhookEndpointBody,
   ListWebhookDeliveriesQuery,
@@ -131,7 +131,7 @@ export function toWebhookDeliveriesListResponse(
   const hasMore = deliveries.length > limit;
   const page = hasMore ? deliveries.slice(0, limit) : deliveries;
   const nextCursor =
-    hasMore && page.length > 0 ? page[page.length - 1]!.id : null;
+    hasMore && page.length > 0 ? (page[page.length - 1]?.id ?? null) : null;
 
   return {
     data: page.map(toWebhookDeliveryResponse),

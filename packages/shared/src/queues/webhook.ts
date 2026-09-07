@@ -1,7 +1,7 @@
 import type { BackoffOptions, JobsOptions } from "bullmq";
 import { z } from "zod";
-import { webhookEventSchema } from "../schemas/webhook.js";
 import { toApiChannel, toApiStatus } from "../schemas/notification.js";
+import type { webhookEventSchema } from "../schemas/webhook.js";
 
 export const WEBHOOK_QUEUE_NAME = "webhook" as const;
 

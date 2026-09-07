@@ -56,7 +56,10 @@ const rateLimitPlugin: FastifyPluginAsync = async (fastify) => {
         });
       }
     } catch (error) {
-      request.log.warn({ err: error }, "rate limit check failed — allowing request");
+      request.log.warn(
+        { err: error },
+        "rate limit check failed — allowing request",
+      );
     }
   });
 };

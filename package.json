@@ -12,7 +12,8 @@
     "dev": "turbo dev --filter=@pingora/api --filter=@pingora/worker",
     "dev:dashboard": "turbo dev --filter=@pingora/dashboard",
     "dev:all": "turbo dev",
-    "lint": "turbo lint",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
     "test": "turbo test",
     "test:unit": "turbo test:unit",
     "test:integration": "turbo test:integration",
@@ -35,6 +36,7 @@
     "postinstall": "pnpm db:generate"
   },
   "devDependencies": {
+    "@biomejs/biome": "^2.5.12",
     "turbo": "^2.5.4",
     "typescript": "^5.8.3"
   },

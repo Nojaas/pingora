@@ -9,7 +9,10 @@ export async function GET() {
     return NextResponse.json(payload);
   } catch (error) {
     if (error instanceof DashboardApiError) {
-      return NextResponse.json({ error: error.message }, { status: error.status });
+      return NextResponse.json(
+        { error: error.message },
+        { status: error.status },
+      );
     }
 
     return NextResponse.json(

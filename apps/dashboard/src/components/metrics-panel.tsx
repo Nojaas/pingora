@@ -11,7 +11,11 @@ function formatLatency(value: number | null) {
   return `${(value / 1000).toFixed(2)} s`;
 }
 
-export function MetricsPanel({ summary }: { summary: DashboardSummaryResponse }) {
+export function MetricsPanel({
+  summary,
+}: {
+  summary: DashboardSummaryResponse;
+}) {
   return (
     <section className="panel">
       <div className="panel-header">
@@ -42,11 +46,14 @@ export function MetricsPanel({ summary }: { summary: DashboardSummaryResponse })
             {formatRate(summary.webhooks.successRate)}
           </p>
           <p className="metric-meta">
-            {summary.webhooks.delivered} ok · {summary.webhooks.retrying} retry ·{" "}
-            {summary.webhooks.failed} fail
+            {summary.webhooks.delivered} ok · {summary.webhooks.retrying} retry
+            · {summary.webhooks.failed} fail
           </p>
         </article>
-        <article className="metric" data-alert={summary.dlq.count > 0 ? "true" : "false"}>
+        <article
+          className="metric"
+          data-alert={summary.dlq.count > 0 ? "true" : "false"}
+        >
           <p className="metric-label">DLQ depth</p>
           <p className="metric-value">{summary.dlq.count}</p>
           <p className="metric-meta">

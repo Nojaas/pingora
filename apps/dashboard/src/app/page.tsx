@@ -1,5 +1,5 @@
-import { Providers } from "./providers";
 import { DashboardHome } from "../components/dashboard-home";
+import { Providers } from "./providers";
 
 export default function HomePage() {
   return (

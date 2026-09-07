@@ -11,18 +11,20 @@ import {
 } from "@pingora/shared";
 import type { Job } from "bullmq";
 import { UnrecoverableError, Worker } from "bullmq";
+import { childLogger } from "../lib/logger.js";
 import {
   deliverWebhookHttp,
   WebhookDeliveryError,
 } from "../providers/webhook.js";
-import { childLogger } from "../lib/logger.js";
 
 const log = childLogger("webhook");
 
 export async function processWebhookJob(job: Job) {
   const parsed = webhookJobDataSchema.safeParse(job.data);
   if (!parsed.success) {
-    throw new UnrecoverableError(`Invalid webhook job: ${parsed.error.message}`);
+    throw new UnrecoverableError(
+      `Invalid webhook job: ${parsed.error.message}`,
+    );
   }
 
   const { deliveryId } = parsed.data;
@@ -108,10 +110,7 @@ export function startWebhookWorker() {
   });
 
   worker.on("completed", (job) => {
-    log.info(
-      { jobId: job.id, result: job.returnvalue },
-      "job completed",
-    );
+    log.info({ jobId: job.id, result: job.returnvalue }, "job completed");
   });
 
   worker.on("failed", (job, error) => {

@@ -1,5 +1,5 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import { UnrecoverableError } from "bullmq";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mockFindUnique = vi.fn();
 const mockUpdate = vi.fn();
@@ -15,7 +15,8 @@ vi.mock("@pingora/db", () => ({
 }));
 
 vi.mock("../providers/webhook.js", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("../providers/webhook.js")>();
+  const actual =
+    await importOriginal<typeof import("../providers/webhook.js")>();
   return {
     ...actual,
     deliverWebhookHttp: (...args: unknown[]) => mockDeliver(...args),

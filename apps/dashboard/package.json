@@ -6,7 +6,7 @@
     "build": "next build",
     "check-types": "tsc --noEmit",
     "dev": "next dev --port 3002",
-    "lint": "echo \"lint: not configured yet\"",
+    "lint": "biome check .",
     "start": "next start --port 3002",
     "test": "echo \"test: not configured yet\"",
     "test:unit": "echo \"test:unit: not configured yet\""

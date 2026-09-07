@@ -19,7 +19,9 @@ export function NotificationsTable({
           <h2>Notifications</h2>
           <p>Aucune notification pour cette API key</p>
         </div>
-        <p className="empty">Envoie un POST /notifications pour peupler la liste.</p>
+        <p className="empty">
+          Envoie un POST /notifications pour peupler la liste.
+        </p>
       </section>
     );
   }

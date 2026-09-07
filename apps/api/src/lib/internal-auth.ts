@@ -30,8 +30,7 @@ export function isInternalAccessAuthorized(request: FastifyRequest): boolean {
   const bearer = extractBearerToken(request.headers.authorization);
   const headerToken = request.headers["x-metrics-token"];
   const token =
-    bearer ??
-    (typeof headerToken === "string" ? headerToken : undefined);
+    bearer ?? (typeof headerToken === "string" ? headerToken : undefined);
 
   return token === secret;
 }

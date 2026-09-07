@@ -1,9 +1,6 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
 import { WEBHOOK_SIGNATURE_HEADER } from "@pingora/shared";
-import {
-  deliverWebhookHttp,
-  WebhookDeliveryError,
-} from "./webhook.js";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { deliverWebhookHttp, type WebhookDeliveryError } from "./webhook.js";
 
 describe("deliverWebhookHttp", () => {
   afterEach(() => {

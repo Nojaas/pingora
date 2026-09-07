@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { resolveEmailProvider } from "./types.js";
 import { buildSesClientConfig } from "./ses.js";
+import { resolveEmailProvider } from "./types.js";
 
 describe("resolveEmailProvider", () => {
   it("defaults to nodemailer", () => {

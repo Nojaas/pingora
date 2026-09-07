@@ -1,7 +1,7 @@
 import { prisma } from "@pingora/db";
 import {
-  EMAIL_DLQ_QUEUE_NAME,
   type DashboardSummaryQuery,
+  EMAIL_DLQ_QUEUE_NAME,
 } from "@pingora/shared";
 import { getQueuesStatus, type QueueCounts } from "./queue.service.js";
 

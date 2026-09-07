@@ -1,14 +1,13 @@
 import { API_KEY_HEADER } from "@pingora/shared";
 import type { FastifyPluginAsync } from "fastify";
 import fp from "fastify-plugin";
+import { hasEveryScope, resolveApiKey } from "../lib/api-key.js";
 import {
   isInternalAccessAuthorized,
   resolveMetricsSecret,
   sendInternalUnauthorized,
   sendMetricsNotConfigured,
 } from "../lib/internal-auth.js";
-import { hasEveryScope, resolveApiKey } from "../lib/api-key.js";
-import type { ApiKeyContext } from "../types/fastify.js";
 
 function isPublicRoute(url: string, config?: { public?: boolean }): boolean {
   if (config?.public === true) {

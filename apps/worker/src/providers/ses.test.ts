@@ -47,7 +47,9 @@ describe("sendEmailViaSes", () => {
     expect(messageId).toBe("ses-msg-1");
     expect(sendMock).toHaveBeenCalledOnce();
 
-    const command = sendMock.mock.calls[0]?.[0] as { input: Record<string, unknown> };
+    const command = sendMock.mock.calls[0]?.[0] as {
+      input: Record<string, unknown>;
+    };
     expect(command.input).toMatchObject({
       Source: "pingora@localhost",
       Destination: { ToAddresses: ["user@example.com"] },

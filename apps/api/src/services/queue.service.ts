@@ -1,8 +1,8 @@
 import {
   EMAIL_DLQ_QUEUE_NAME,
   EMAIL_QUEUE_NAME,
-  WEBHOOK_QUEUE_NAME,
   getRedisConnectionOptions,
+  WEBHOOK_QUEUE_NAME,
 } from "@pingora/shared";
 import { Queue } from "bullmq";
 

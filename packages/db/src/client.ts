@@ -1,7 +1,7 @@
-import { resolve, dirname } from "node:path";
+import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { config } from "dotenv";
 import { PrismaPg } from "@prisma/adapter-pg";
+import { config } from "dotenv";
 import { PrismaClient } from "./generated/prisma/client.js";
 
 const rootEnv = resolve(
