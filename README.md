@@ -138,13 +138,15 @@ pnpm lint
 pnpm check-types
 pnpm test:unit
 pnpm test:integration
+pnpm test:containers
 pnpm build
 ```
 
 - Lint / format : Biome (`pnpm lint`, `pnpm lint:fix`)
 - Unitaires : Vitest (shared, api services, worker processors)
-- Intégration : Fastify `inject` (auth, notifications, webhooks, metrics)
-- CI : [`.github/workflows/ci.yml`](./.github/workflows/ci.yml) — lint → test → build → images GHCR (`pingora-api`, `pingora-worker`) sur push `main`/`develop`
+- Intégration mockée : Fastify `inject` (auth, notifications, webhooks, metrics)
+- Intégration containers : Testcontainers Postgres + Redis (`pnpm test:containers`, Docker requis)
+- CI : [`.github/workflows/ci.yml`](./.github/workflows/ci.yml) — lint → unit + containers → build → images GHCR
 
 ---
 
