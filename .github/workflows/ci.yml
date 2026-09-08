@@ -66,8 +66,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Test
+      - name: Unit tests
         run: pnpm test
+
+      - name: Container integration tests
+        run: pnpm test:containers
 
   build:
     name: Build
