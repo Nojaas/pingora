@@ -1,6 +1,6 @@
 import nodemailer from "nodemailer";
-import { resolveEmailProvider, type SendEmailInput } from "./types.js";
 import { sendEmailViaSes } from "./ses.js";
+import { resolveEmailProvider, type SendEmailInput } from "./types.js";
 
 export type { SendEmailInput } from "./types.js";
 export { resolveEmailProvider } from "./types.js";

@@ -56,10 +56,7 @@ export function WebhookDeliveriesTable({
             {deliveries.map((delivery) => (
               <tr key={delivery.id}>
                 <td>
-                  <span
-                    className="badge"
-                    data-status={delivery.status}
-                  >
+                  <span className="badge" data-status={delivery.status}>
                     {delivery.status}
                   </span>
                 </td>

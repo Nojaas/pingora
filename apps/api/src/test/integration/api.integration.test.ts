@@ -7,11 +7,15 @@ import type { FastifyInstance } from "fastify";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { buildApp } from "../../app.js";
 import {
+  API_KEYS,
+  prismaStore,
+  seedIntegrationApiKeys,
+} from "../prisma-store.js";
+import {
   inboundIdempotencyKeys,
   mockCheckRateLimit,
   mockEnqueueEmail,
 } from "../setup.integration.js";
-import { API_KEYS, prismaStore, seedIntegrationApiKeys } from "../prisma-store.js";
 
 async function createTestApp(): Promise<FastifyInstance> {
   const app = await buildApp({ logger: false });
@@ -447,9 +451,7 @@ describe("API integration — notifications", () => {
 
     expect(secondPage.statusCode).toBe(200);
     expect(secondPage.json()).toEqual({
-      data: [
-        expect.objectContaining({ id: "notif_integration_1" }),
-      ],
+      data: [expect.objectContaining({ id: "notif_integration_1" })],
       pagination: {
         nextCursor: null,
         hasMore: false,

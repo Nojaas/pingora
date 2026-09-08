@@ -15,7 +15,9 @@ describe("buildRateLimitKey", () => {
 
 describe("parseSlidingWindowRateLimitResult", () => {
   it("parses an allowed decision", () => {
-    expect(parseSlidingWindowRateLimitResult([1, 42, 0, 1_700_000_000], 1000)).toEqual({
+    expect(
+      parseSlidingWindowRateLimitResult([1, 42, 0, 1_700_000_000], 1000),
+    ).toEqual({
       allowed: true,
       limit: 1000,
       remaining: 958,
@@ -24,7 +26,9 @@ describe("parseSlidingWindowRateLimitResult", () => {
   });
 
   it("parses a blocked decision with retry-after", () => {
-    expect(parseSlidingWindowRateLimitResult([0, 1000, 12, 1_700_000_060], 1000)).toEqual({
+    expect(
+      parseSlidingWindowRateLimitResult([0, 1000, 12, 1_700_000_060], 1000),
+    ).toEqual({
       allowed: false,
       limit: 1000,
       remaining: 0,

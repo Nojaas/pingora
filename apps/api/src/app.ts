@@ -1,22 +1,19 @@
-import { resolve, dirname } from "node:path";
+import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { createFastifyLogger, LOG_SERVICES } from "@pingora/shared";
 import { config } from "dotenv";
-import {
-  createFastifyLogger,
-  LOG_SERVICES,
-} from "@pingora/shared";
 import Fastify from "fastify";
 import authPlugin from "./plugins/auth.js";
+import metricsPlugin from "./plugins/metrics.js";
 import rateLimitPlugin from "./plugins/rate-limit.js";
+import dashboardRoutes from "./routes/dashboard.js";
 import healthRoutes from "./routes/health.js";
-import metricsRoutes from "./routes/metrics.js";
+import inboundWebhooksRoutes from "./routes/inbound-webhooks.js";
 import meRoutes from "./routes/me.js";
+import metricsRoutes from "./routes/metrics.js";
 import notificationsRoutes from "./routes/notifications.js";
 import queuesRoutes from "./routes/queues.js";
-import dashboardRoutes from "./routes/dashboard.js";
 import webhooksRoutes from "./routes/webhooks.js";
-import inboundWebhooksRoutes from "./routes/inbound-webhooks.js";
-import metricsPlugin from "./plugins/metrics.js";
 
 const rootEnv = resolve(
   dirname(fileURLToPath(import.meta.url)),

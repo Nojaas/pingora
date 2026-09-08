@@ -1,18 +1,14 @@
 import {
+  isRetryableWebhookStatus,
   WEBHOOK_DELIVERY_TIMEOUT_MS,
   WEBHOOK_SIGNATURE_HEADER,
-  isRetryableWebhookStatus,
 } from "@pingora/shared";
 
 export class WebhookDeliveryError extends Error {
   readonly statusCode: number | null;
   readonly retryable: boolean;
 
-  constructor(
-    message: string,
-    statusCode: number | null,
-    retryable: boolean,
-  ) {
+  constructor(message: string, statusCode: number | null, retryable: boolean) {
     super(message);
     this.name = "WebhookDeliveryError";
     this.statusCode = statusCode;
@@ -54,11 +50,7 @@ export async function deliverWebhookHttp(
     });
   } catch (error) {
     if (isAbortError(error)) {
-      throw new WebhookDeliveryError(
-        "Webhook delivery timed out",
-        null,
-        true,
-      );
+      throw new WebhookDeliveryError("Webhook delivery timed out", null, true);
     }
 
     const message =

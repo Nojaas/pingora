@@ -1,14 +1,11 @@
 "use client";
 
-import {
-  useDashboardUi,
-  type RefreshIntervalMs,
-} from "../store/dashboard-ui";
 import type {
   NotificationChannel,
   NotificationStatus,
   WebhookDeliveryStatus,
 } from "../lib/types";
+import { type RefreshIntervalMs, useDashboardUi } from "../store/dashboard-ui";
 
 const STATUS_OPTIONS: Array<NotificationStatus | "all"> = [
   "all",

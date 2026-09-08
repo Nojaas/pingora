@@ -45,10 +45,7 @@ export function startEmailDlqWorker() {
   });
 
   worker.on("completed", (job) => {
-    log.info(
-      { jobId: job.id, result: job.returnvalue },
-      "job processed",
-    );
+    log.info({ jobId: job.id, result: job.returnvalue }, "job processed");
   });
 
   worker.on("failed", (job, error) => {

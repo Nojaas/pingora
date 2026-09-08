@@ -6,10 +6,16 @@ export const LOG_SERVICES = {
   WORKER: "pingora-worker",
 } as const;
 
-export type PingoraService =
-  (typeof LOG_SERVICES)[keyof typeof LOG_SERVICES];
+export type PingoraService = (typeof LOG_SERVICES)[keyof typeof LOG_SERVICES];
 
-const LOG_LEVELS = ["fatal", "error", "warn", "info", "debug", "trace"] as const;
+const LOG_LEVELS = [
+  "fatal",
+  "error",
+  "warn",
+  "info",
+  "debug",
+  "trace",
+] as const;
 
 export type LogLevel = (typeof LOG_LEVELS)[number];
 

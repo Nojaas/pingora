@@ -1,10 +1,10 @@
+import { LOG_SERVICES, PINGORA_VERSION } from "@pingora/shared";
 import {
-  collectDefaultMetrics,
   Counter,
+  collectDefaultMetrics,
   Histogram,
   Registry,
 } from "@prometheus-io/client";
-import { LOG_SERVICES, PINGORA_VERSION } from "@pingora/shared";
 
 export const metricsRegistry = new Registry();
 

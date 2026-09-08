@@ -8,10 +8,7 @@ import {
 describe("toInboundAck", () => {
   it("builds the ack payload", () => {
     expect(
-      toInboundAck(
-        { id: "evt_1", type: "provider.ping", data: {} },
-        false,
-      ),
+      toInboundAck({ id: "evt_1", type: "provider.ping", data: {} }, false),
     ).toEqual({
       received: true,
       id: "evt_1",
@@ -38,9 +35,9 @@ describe("claimInboundEvent", () => {
 
   it("returns duplicate when the key already exists", async () => {
     const set = vi.fn().mockResolvedValue(null);
-    await expect(
-      claimInboundEvent({ set } as never, "evt_1"),
-    ).resolves.toBe("duplicate");
+    await expect(claimInboundEvent({ set } as never, "evt_1")).resolves.toBe(
+      "duplicate",
+    );
   });
 });
 

@@ -13,8 +13,7 @@ export const inboundWebhookBodySchema = z.object({
 
 export type InboundWebhookBody = z.infer<typeof inboundWebhookBodySchema>;
 
-export const INBOUND_WEBHOOK_IDEMPOTENCY_PREFIX =
-  "pingora:inbound:" as const;
+export const INBOUND_WEBHOOK_IDEMPOTENCY_PREFIX = "pingora:inbound:" as const;
 
 export const INBOUND_WEBHOOK_IDEMPOTENCY_TTL_SECONDS = 86_400;
 

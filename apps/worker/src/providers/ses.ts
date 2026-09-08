@@ -1,7 +1,7 @@
 import {
   SESClient,
-  SendEmailCommand,
   type SESClientConfig,
+  SendEmailCommand,
 } from "@aws-sdk/client-ses";
 import type { SendEmailInput } from "./types.js";
 

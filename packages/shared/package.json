@@ -12,7 +12,7 @@
   "scripts": {
     "build": "tsup",
     "check-types": "tsc --noEmit",
-    "lint": "echo \"lint: not configured yet\"",
+    "lint": "biome check .",
     "test": "vitest run",
     "test:unit": "vitest run"
   },

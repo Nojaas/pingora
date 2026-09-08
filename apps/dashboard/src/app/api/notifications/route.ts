@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import { DashboardApiError, fetchNotifications } from "../../../lib/api";
-import type { NotificationChannel, NotificationStatus } from "../../../lib/types";
+import type {
+  NotificationChannel,
+  NotificationStatus,
+} from "../../../lib/types";
 
 export const dynamic = "force-dynamic";
 
@@ -40,7 +43,10 @@ export async function GET(request: Request) {
     return NextResponse.json(payload);
   } catch (error) {
     if (error instanceof DashboardApiError) {
-      return NextResponse.json({ error: error.message }, { status: error.status });
+      return NextResponse.json(
+        { error: error.message },
+        { status: error.status },
+      );
     }
 
     return NextResponse.json(

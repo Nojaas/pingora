@@ -1,4 +1,4 @@
-import { prisma, Prisma } from "@pingora/db";
+import { type Prisma, prisma } from "@pingora/db";
 import type {
   CreateNotificationBody,
   ListNotificationsQuery,
@@ -53,7 +53,7 @@ export function toNotificationsListResponse(
   const hasMore = notifications.length > limit;
   const page = hasMore ? notifications.slice(0, limit) : notifications;
   const nextCursor =
-    hasMore && page.length > 0 ? page[page.length - 1]!.id : null;
+    hasMore && page.length > 0 ? (page[page.length - 1]?.id ?? null) : null;
 
   return {
     data: page.map(toNotificationResponse),

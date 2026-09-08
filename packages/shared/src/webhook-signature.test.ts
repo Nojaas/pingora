@@ -53,7 +53,7 @@ describe("verifyWebhookSignature", () => {
     const signed = signWebhookPayload(secret, body, 1_700_000_000);
 
     expect(
-      verifyWebhookSignature(secret, body + "x", signed.header, {
+      verifyWebhookSignature(secret, `${body}x`, signed.header, {
         now: 1_700_000_000,
       }),
     ).toBe(false);
@@ -102,9 +102,10 @@ describe("verifyWebhookSignature", () => {
 
 describe("parseWebhookSignatureHeader", () => {
   it("parses t and v1 in any order", () => {
-    expect(
-      parseWebhookSignatureHeader("v1=deadbeef,t=42"),
-    ).toEqual({ timestamp: 42, signature: "deadbeef" });
+    expect(parseWebhookSignatureHeader("v1=deadbeef,t=42")).toEqual({
+      timestamp: 42,
+      signature: "deadbeef",
+    });
   });
 
   it("returns null when required parts are missing", () => {

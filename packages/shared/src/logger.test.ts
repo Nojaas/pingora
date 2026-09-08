@@ -1,8 +1,8 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
-  LOG_SERVICES,
   buildLoggerOptions,
   createLogger,
+  LOG_SERVICES,
   resolveLogLevel,
 } from "./logger.js";
 

@@ -138,10 +138,7 @@ export function startEmailWorker() {
   });
 
   worker.on("completed", (job) => {
-    log.info(
-      { jobId: job.id, result: job.returnvalue },
-      "job completed",
-    );
+    log.info({ jobId: job.id, result: job.returnvalue }, "job completed");
   });
 
   worker.on("failed", async (job, error) => {
@@ -169,7 +166,10 @@ export function startEmailWorker() {
         log.error(
           {
             jobId: job.id,
-            err: dlqError instanceof Error ? dlqError : { message: String(dlqError) },
+            err:
+              dlqError instanceof Error
+                ? dlqError
+                : { message: String(dlqError) },
           },
           "DLQ enqueue failed after exhausted attempts",
         );

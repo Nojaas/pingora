@@ -39,7 +39,9 @@ async function bffFetch<T>(path: string): Promise<T> {
   return (await response.json()) as T;
 }
 
-export function fetchNotificationsClient(params: FetchNotificationsParams = {}) {
+export function fetchNotificationsClient(
+  params: FetchNotificationsParams = {},
+) {
   const search = new URLSearchParams();
   search.set("limit", String(params.limit ?? 25));
   if (params.status) search.set("status", params.status);

@@ -1,5 +1,5 @@
-import { hashApiKey, isApiKeyFormat } from "@pingora/shared";
 import { prisma } from "@pingora/db";
+import { hashApiKey, isApiKeyFormat } from "@pingora/shared";
 import type { ApiKeyContext } from "../types/fastify.js";
 
 export async function resolveApiKey(
