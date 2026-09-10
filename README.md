@@ -160,16 +160,33 @@ pnpm build
 
 ---
 
+## Déploiement (Railway)
+
+API + worker + Postgres + Redis. Le dashboard reste en local.
+
+Guide pas à pas : [`infra/railway.md`](./infra/railway.md).
+
+Résumé :
+
+1. Projet Railway → plugins **PostgreSQL** + **Redis**
+2. Deux services depuis le même repo : config `/apps/api/railway.json` et `/apps/worker/railway.json`
+3. Variables partagées (dont `DATABASE_URL` / `REDIS_URL` en références Railway) + **Resend SMTP**
+4. Depuis le laptop : `prisma migrate deploy` + `pnpm db:seed` contre la DB Railway
+5. Domaine public sur **api** uniquement → smoke `GET /health` + `POST /notifications`
+
+---
+
 ## Documentation
 
 | Document | Contenu |
 | -------- | ------- |
 | [`.env.example`](./.env.example) | Variables d’environnement |
-| `infra/docker-compose.yml` | Stack locale (Postgres, Redis, Mailpit, LocalStack) |
+| [`infra/docker-compose.yml`](./infra/docker-compose.yml) | Stack locale (Postgres, Redis, Mailpit, LocalStack) |
+| [`infra/railway.md`](./infra/railway.md) | Déploiement Railway + Resend |
 
 ---
 
 ## Statut
 
-Phases 1–5 livrées (API + worker, webhooks, Docker, observabilité, dashboard monitoring, CI/CD GHCR).
+Phases 1–5 livrées (API + worker, webhooks, Docker, observabilité, dashboard monitoring, CI/CD GHCR). Déploiement Railway documenté.
 

@@ -3,6 +3,7 @@
 # Build from repo root:
 #   docker build -f apps/worker/Dockerfile --target prod -t pingora-worker:prod .
 #   docker build -f apps/worker/Dockerfile --target dev -t pingora-worker:dev .
+# Default / last stage is prod (Railway builds the final stage).
 
 ARG NODE_VERSION=22
 ARG PNPM_VERSION=10.11.0
@@ -29,15 +30,6 @@ ENV DATABASE_URL=postgresql://postgres:postgres@localhost:5432/pingora
 RUN pnpm turbo build --filter=@pingora/worker
 RUN pnpm deploy --filter=@pingora/worker --prod --legacy /deploy
 
-FROM node:${NODE_VERSION}-alpine AS prod
-RUN apk add --no-cache libc6-compat openssl
-ENV NODE_ENV=production
-WORKDIR /app
-RUN addgroup -S pingora && adduser -S pingora -G pingora
-COPY --from=prod-builder --chown=pingora:pingora /deploy .
-USER pingora
-CMD ["node", "dist/index.js"]
-
 FROM base AS dev
 WORKDIR /app
 COPY pnpm-lock.yaml pnpm-workspace.yaml package.json turbo.json tsconfig.base.json ./
@@ -51,3 +43,13 @@ ENV NODE_ENV=development
 ENV DATABASE_URL=postgresql://postgres:postgres@localhost:5432/pingora
 RUN pnpm db:generate
 CMD ["pnpm", "--filter", "@pingora/worker", "dev"]
+
+# Last stage = default Docker/Railway target (compose still uses --target)
+FROM node:${NODE_VERSION}-alpine AS prod
+RUN apk add --no-cache libc6-compat openssl
+ENV NODE_ENV=production
+WORKDIR /app
+RUN addgroup -S pingora && adduser -S pingora -G pingora
+COPY --from=prod-builder --chown=pingora:pingora /deploy .
+USER pingora
+CMD ["node", "dist/index.js"]
