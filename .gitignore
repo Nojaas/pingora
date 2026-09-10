@@ -26,12 +26,12 @@ pnpm-debug.log*
 
 # Test / coverage
 coverage
+**/.containers-env.json
 
 # Prisma
 packages/db/src/generated/
 
 # Local docs (personal notes, not versioned)
-README.md
 specs.md
 
 # Misc

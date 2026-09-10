@@ -2,7 +2,9 @@ import { z } from "zod";
 
 export const notificationChannelSchema = z.enum(["email", "sms", "push"]);
 
-export type NotificationChannelInput = z.infer<typeof notificationChannelSchema>;
+export type NotificationChannelInput = z.infer<
+  typeof notificationChannelSchema
+>;
 
 export const notificationStatusSchema = z.enum([
   "pending",
@@ -64,16 +66,15 @@ export const createNotificationBodySchema = z
     }
   });
 
-export type CreateNotificationBody = z.infer<typeof createNotificationBodySchema>;
+export type CreateNotificationBody = z.infer<
+  typeof createNotificationBodySchema
+>;
 
 export const PRISMA_CHANNEL_MAP = {
   email: "EMAIL",
   sms: "SMS",
   push: "PUSH",
-} as const satisfies Record<
-  NotificationChannelInput,
-  "EMAIL" | "SMS" | "PUSH"
->;
+} as const satisfies Record<NotificationChannelInput, "EMAIL" | "SMS" | "PUSH">;
 
 export function toPrismaChannel(channel: NotificationChannelInput) {
   return PRISMA_CHANNEL_MAP[channel];

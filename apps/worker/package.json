@@ -7,12 +7,13 @@
     "build": "tsup",
     "check-types": "tsc --noEmit",
     "dev": "tsx watch src/index.ts",
-    "lint": "echo \"lint: not configured yet\"",
+    "lint": "biome check .",
     "start": "node dist/index.js",
     "test": "vitest run",
     "test:unit": "vitest run"
   },
   "dependencies": {
+    "@aws-sdk/client-ses": "^3.1126.0",
     "@pingora/db": "workspace:*",
     "@pingora/shared": "workspace:*",
     "bullmq": "^5.56.0",

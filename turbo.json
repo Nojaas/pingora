@@ -1,8 +1,10 @@
 {
   "$schema": "https://turborepo.dev/schema.json",
+  "globalDependencies": ["tsconfig.base.json"],
+  "globalPassThroughEnv": ["DATABASE_URL", "REDIS_URL", "NODE_ENV"],
   "tasks": {
     "build": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["^build", "generate"],
       "outputs": ["dist/**", ".next/**", "!.next/cache/**"]
     },
     "generate": {
@@ -10,7 +12,7 @@
       "outputs": ["src/generated/**"]
     },
     "check-types": {
-      "dependsOn": ["^check-types"]
+      "dependsOn": ["generate", "^build"]
     },
     "lint": {
       "dependsOn": ["^lint"]
@@ -28,6 +30,10 @@
     },
     "test:integration": {
       "cache": false
+    },
+    "test:containers": {
+      "cache": false,
+      "dependsOn": ["generate"]
     },
     "test:e2e": {
       "cache": false

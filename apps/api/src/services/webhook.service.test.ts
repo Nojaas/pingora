@@ -4,6 +4,7 @@ const mockCreate = vi.fn();
 const mockFindMany = vi.fn();
 const mockFindFirst = vi.fn();
 const mockDelete = vi.fn();
+const mockDeliveryFindMany = vi.fn();
 
 vi.mock("@pingora/db", () => ({
   prisma: {
@@ -13,13 +14,18 @@ vi.mock("@pingora/db", () => ({
       findFirst: (...args: unknown[]) => mockFindFirst(...args),
       delete: (...args: unknown[]) => mockDelete(...args),
     },
+    webhookDelivery: {
+      findMany: (...args: unknown[]) => mockDeliveryFindMany(...args),
+    },
   },
 }));
 
 const {
   createWebhookEndpoint,
   deleteWebhookEndpoint,
+  listWebhookDeliveries,
   listWebhookEndpoints,
+  toWebhookDeliveryResponse,
   toWebhookEndpointResponse,
 } = await import("./webhook.service.js");
 
@@ -96,6 +102,60 @@ describe("listWebhookEndpoints", () => {
   });
 });
 
+describe("listWebhookDeliveries", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("lists deliveries scoped to the api key with derived status", async () => {
+    mockDeliveryFindMany.mockResolvedValue([
+      {
+        id: "del_2",
+        endpointId: "wh_1",
+        notificationId: "notif_1",
+        event: "notification.sent",
+        statusCode: 200,
+        attempts: 1,
+        nextRetryAt: null,
+        deliveredAt: new Date("2026-05-23T12:00:02.000Z"),
+        createdAt: new Date("2026-05-23T12:00:00.000Z"),
+      },
+      {
+        id: "del_1",
+        endpointId: "wh_1",
+        notificationId: "notif_2",
+        event: "notification.failed",
+        statusCode: 500,
+        attempts: 3,
+        nextRetryAt: null,
+        deliveredAt: null,
+        createdAt: new Date("2026-05-23T11:00:00.000Z"),
+      },
+    ]);
+
+    const result = await listWebhookDeliveries(apiKeyId, {
+      limit: 20,
+      status: "failed",
+    });
+
+    expect(mockDeliveryFindMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({
+          endpoint: { apiKeyId },
+          deliveredAt: null,
+          nextRetryAt: null,
+          attempts: { gt: 0 },
+        }),
+        take: 21,
+      }),
+    );
+    expect(result.data[0]?.status).toBe("success");
+    expect(result.data[0]?.latencyMs).toBe(2000);
+    expect(result.data[1]?.status).toBe("failed");
+    expect(result.pagination.hasMore).toBe(false);
+  });
+});
+
 describe("deleteWebhookEndpoint", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -124,5 +184,23 @@ describe("toWebhookEndpointResponse", () => {
     expect(
       toWebhookEndpointResponse(createdRecord, { includeSecret: false }),
     ).not.toHaveProperty("secret");
+  });
+});
+
+describe("toWebhookDeliveryResponse", () => {
+  it("marks retrying deliveries", () => {
+    expect(
+      toWebhookDeliveryResponse({
+        id: "del_r",
+        endpointId: "wh_1",
+        notificationId: "notif_1",
+        event: "notification.sent",
+        statusCode: 503,
+        attempts: 1,
+        nextRetryAt: new Date("2026-05-23T12:01:00.000Z"),
+        deliveredAt: null,
+        createdAt: new Date("2026-05-23T12:00:00.000Z"),
+      }).status,
+    ).toBe("retrying");
   });
 });

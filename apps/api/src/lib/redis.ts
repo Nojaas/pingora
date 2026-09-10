@@ -5,9 +5,7 @@ let redis: Redis | undefined;
 export function getRedisClient(): Redis {
   const url = process.env.REDIS_URL;
   if (!url) {
-    throw new Error(
-      "REDIS_URL is not set. Start Redis with `pnpm infra:up`.",
-    );
+    throw new Error("REDIS_URL is not set. Start Redis with `pnpm infra:up`.");
   }
 
   redis ??= new Redis(url, {

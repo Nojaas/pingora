@@ -1,8 +1,5 @@
-import { prisma, Prisma } from "@pingora/db";
-import {
-  buildWebhookEventPayload,
-  type WebhookEvent,
-} from "@pingora/shared";
+import { type Prisma, prisma } from "@pingora/db";
+import { buildWebhookEventPayload, type WebhookEvent } from "@pingora/shared";
 import { enqueueWebhookDelivery } from "../queues/webhook.queue.js";
 
 export async function dispatchNotificationWebhooks(

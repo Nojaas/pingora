@@ -25,10 +25,7 @@ const notificationsRoutes: FastifyPluginAsync = async (fastify) => {
         return reply.code(400).send(formatZodError(parsed.error));
       }
 
-      const result = await listNotifications(
-        request.apiKey!.id,
-        parsed.data,
-      );
+      const result = await listNotifications(request.apiKey!.id, parsed.data);
 
       return reply.send(result);
     },

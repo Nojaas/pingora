@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
   createWebhookEndpointBodySchema,
+  deriveWebhookDeliveryStatus,
+  listWebhookDeliveriesQuerySchema,
   WEBHOOK_EVENTS,
 } from "./webhook.js";
 
@@ -72,5 +74,60 @@ describe("createWebhookEndpointBodySchema", () => {
       ],
     });
     expect(result.success).toBe(false);
+  });
+});
+
+describe("listWebhookDeliveriesQuerySchema", () => {
+  it("applies defaults", () => {
+    const result = listWebhookDeliveriesQuerySchema.safeParse({});
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.limit).toBe(20);
+    }
+  });
+
+  it("accepts status filters", () => {
+    const result = listWebhookDeliveriesQuerySchema.safeParse({
+      status: "retrying",
+      limit: "10",
+    });
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.status).toBe("retrying");
+      expect(result.data.limit).toBe(10);
+    }
+  });
+});
+
+describe("deriveWebhookDeliveryStatus", () => {
+  it("maps delivery fields to status", () => {
+    expect(
+      deriveWebhookDeliveryStatus({
+        deliveredAt: new Date(),
+        nextRetryAt: null,
+        attempts: 1,
+      }),
+    ).toBe("success");
+    expect(
+      deriveWebhookDeliveryStatus({
+        deliveredAt: null,
+        nextRetryAt: new Date(),
+        attempts: 1,
+      }),
+    ).toBe("retrying");
+    expect(
+      deriveWebhookDeliveryStatus({
+        deliveredAt: null,
+        nextRetryAt: null,
+        attempts: 2,
+      }),
+    ).toBe("failed");
+    expect(
+      deriveWebhookDeliveryStatus({
+        deliveredAt: null,
+        nextRetryAt: null,
+        attempts: 0,
+      }),
+    ).toBe("pending");
   });
 });

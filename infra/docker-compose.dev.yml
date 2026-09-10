@@ -1,0 +1,33 @@
+# Override dev : hot reload api + worker dans Docker
+# Usage : pnpm docker:dev
+
+services:
+  api:
+    build:
+      target: dev
+    environment:
+      NODE_ENV: development
+    volumes:
+      - ..:/app
+      - api_node_modules:/app/node_modules
+    command: ["pnpm", "--filter", "@pingora/api", "dev"]
+
+  worker:
+    build:
+      target: dev
+    environment:
+      NODE_ENV: development
+    volumes:
+      - ..:/app
+      - worker_node_modules:/app/node_modules
+    command: ["pnpm", "--filter", "@pingora/worker", "dev"]
+
+  migrate:
+    volumes:
+      - ..:/app
+      - migrate_node_modules:/app/node_modules
+
+volumes:
+  api_node_modules:
+  worker_node_modules:
+  migrate_node_modules:

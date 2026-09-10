@@ -11,15 +11,19 @@ export type ApiKeyContext = {
 declare module "fastify" {
   interface FastifyRequest {
     apiKey?: ApiKeyContext;
+    metricsStartNs?: bigint;
   }
 
   interface FastifyRouteConfig {
     /** Route accessible without x-api-key (ex. /health) */
     public?: boolean;
+    /** Route interne protégée par METRICS_SECRET / ADMIN_SECRET */
+    internal?: boolean;
   }
 
   interface FastifyContextConfig {
     public?: boolean;
+    internal?: boolean;
   }
 }
 

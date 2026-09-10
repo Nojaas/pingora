@@ -7,6 +7,9 @@ import {
 } from "@pingora/shared";
 import type { Job } from "bullmq";
 import { Worker } from "bullmq";
+import { childLogger } from "../lib/logger.js";
+
+const log = childLogger("email-dlq");
 
 async function processEmailDlqJob(job: Job) {
   const parsed = emailDlqJobDataSchema.safeParse(job.data);
@@ -25,6 +28,7 @@ async function processEmailDlqJob(job: Job) {
       attempts: data.attemptsMade,
       timestamp: data.failedAt,
     }),
+    log,
   );
 
   return {
@@ -41,11 +45,11 @@ export function startEmailDlqWorker() {
   });
 
   worker.on("completed", (job) => {
-    console.log(`[email-dlq] job ${job.id} processed`, job.returnvalue);
+    log.info({ jobId: job.id, result: job.returnvalue }, "job processed");
   });
 
   worker.on("failed", (job, error) => {
-    console.error(`[email-dlq] job ${job?.id} failed`, error.message);
+    log.error({ jobId: job?.id, err: error }, "job failed");
   });
 
   return worker;

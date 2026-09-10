@@ -2,7 +2,12 @@ import { API_KEY_HEADER } from "@pingora/shared";
 import type { FastifyPluginAsync } from "fastify";
 import fp from "fastify-plugin";
 import { hasEveryScope, resolveApiKey } from "../lib/api-key.js";
-import type { ApiKeyContext } from "../types/fastify.js";
+import {
+  isInternalAccessAuthorized,
+  resolveMetricsSecret,
+  sendInternalUnauthorized,
+  sendMetricsNotConfigured,
+} from "../lib/internal-auth.js";
 
 function isPublicRoute(url: string, config?: { public?: boolean }): boolean {
   if (config?.public === true) {
@@ -13,11 +18,27 @@ function isPublicRoute(url: string, config?: { public?: boolean }): boolean {
   return pathname === "/health";
 }
 
+function isInternalRoute(config?: { internal?: boolean }): boolean {
+  return config?.internal === true;
+}
+
 const authPlugin: FastifyPluginAsync = async (fastify) => {
   fastify.decorateRequest("apiKey", undefined);
 
   fastify.addHook("onRequest", async (request, reply) => {
     const routeConfig = request.routeOptions.config;
+
+    if (isInternalRoute(routeConfig)) {
+      if (!resolveMetricsSecret()) {
+        return sendMetricsNotConfigured(reply);
+      }
+
+      if (!isInternalAccessAuthorized(request)) {
+        return sendInternalUnauthorized(reply);
+      }
+
+      return;
+    }
 
     if (isPublicRoute(request.url, routeConfig)) {
       return;

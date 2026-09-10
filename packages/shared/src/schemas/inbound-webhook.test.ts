@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
   buildInboundIdempotencyKey,
-  inboundWebhookBodySchema,
   INBOUND_WEBHOOK_IDEMPOTENCY_PREFIX,
+  inboundWebhookBodySchema,
 } from "./inbound-webhook.js";
 
 describe("inboundWebhookBodySchema", () => {

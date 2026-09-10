@@ -43,11 +43,9 @@ describe("rateLimitPlugin", () => {
 
     await app.register(rateLimitPlugin);
     app.get("/protected", async () => ({ ok: true }));
-    app.get(
-      "/health",
-      { config: { public: true } },
-      async () => ({ status: "ok" }),
-    );
+    app.get("/health", { config: { public: true } }, async () => ({
+      status: "ok",
+    }));
 
     return app;
   }

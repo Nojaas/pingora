@@ -10,9 +10,9 @@ import {
 
 describe("webhookJobDataSchema", () => {
   it("accepts a delivery id", () => {
-    expect(webhookJobDataSchema.safeParse({ deliveryId: "whd_1" }).success).toBe(
-      true,
-    );
+    expect(
+      webhookJobDataSchema.safeParse({ deliveryId: "whd_1" }).success,
+    ).toBe(true);
   });
 
   it("rejects an empty delivery id", () => {

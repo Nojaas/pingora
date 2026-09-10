@@ -10,10 +10,10 @@
     }
   },
   "scripts": {
-    "build": "pnpm generate && tsup && cp -R src/generated dist/",
-    "check-types": "pnpm generate && tsc --noEmit",
+    "build": "tsup",
+    "check-types": "tsc -p tsconfig.build.json --noEmit",
     "generate": "prisma generate",
-    "lint": "echo \"lint: not configured yet\"",
+    "lint": "biome check .",
     "migrate": "dotenv -e ../../.env -- prisma migrate dev",
     "migrate:deploy": "dotenv -e ../../.env -- prisma migrate deploy",
     "seed": "dotenv -e ../../.env -- tsx src/seed.ts",

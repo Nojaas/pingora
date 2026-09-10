@@ -2,8 +2,8 @@ import {
   EMAIL_JOB_DEFAULT_OPTIONS,
   EMAIL_JOB_NAME,
   EMAIL_QUEUE_NAME,
-  getRedisConnectionOptions,
   type EmailJobData,
+  getRedisConnectionOptions,
 } from "@pingora/shared";
 import { Queue } from "bullmq";
 

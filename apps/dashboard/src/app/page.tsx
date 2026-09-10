@@ -1,10 +1,10 @@
-import { PINGORA_VERSION } from "@pingora/shared";
+import { DashboardHome } from "../components/dashboard-home";
+import { Providers } from "./providers";
 
 export default function HomePage() {
   return (
-    <main style={{ fontFamily: "system-ui", padding: "2rem" }}>
-      <h1>Pingora Dashboard</h1>
-      <p>Monorepo prêt — version {PINGORA_VERSION}</p>
-    </main>
+    <Providers>
+      <DashboardHome />
+    </Providers>
   );
 }
