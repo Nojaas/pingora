@@ -5,15 +5,41 @@ import { resolveEmailProvider, type SendEmailInput } from "./types.js";
 export type { SendEmailInput } from "./types.js";
 export { resolveEmailProvider } from "./types.js";
 
-function createTransporter() {
-  const host = process.env.SMTP_HOST ?? "localhost";
-  const port = Number(process.env.SMTP_PORT ?? 1025);
+export type SmtpTransportEnv = {
+  SMTP_HOST?: string;
+  SMTP_PORT?: string;
+  SMTP_USER?: string;
+  SMTP_PASS?: string;
+  SMTP_SECURE?: string;
+};
 
-  return nodemailer.createTransport({
+export function buildSmtpTransportOptions(env: SmtpTransportEnv = process.env) {
+  const host = env.SMTP_HOST ?? "localhost";
+  const port = Number(env.SMTP_PORT ?? 1025);
+  const user = env.SMTP_USER?.trim();
+  const pass = env.SMTP_PASS;
+  const secure =
+    env.SMTP_SECURE?.toLowerCase() === "true" ||
+    env.SMTP_SECURE === "1" ||
+    port === 465;
+
+  return {
     host,
     port,
-    secure: false,
-  });
+    secure,
+    ...(user
+      ? {
+          auth: {
+            user,
+            pass: pass ?? "",
+          },
+        }
+      : {}),
+  };
+}
+
+function createTransporter() {
+  return nodemailer.createTransport(buildSmtpTransportOptions());
 }
 
 async function sendEmailViaNodemailer(input: SendEmailInput): Promise<string> {

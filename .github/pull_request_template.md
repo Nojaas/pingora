@@ -6,6 +6,7 @@
 ## Test plan
 - [ ] `pnpm test:unit`
 - [ ] `pnpm test:integration` (if API touched)
+- [ ] `pnpm test:containers` (Docker required)
 - [ ] `pnpm check-types`
 - [ ] Manual smoke (curl / Mailpit) if behavior changed
 

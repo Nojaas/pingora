@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { buildSmtpTransportOptions } from "./email.js";
 import { buildSesClientConfig } from "./ses.js";
 import { resolveEmailProvider } from "./types.js";
 
@@ -19,6 +20,51 @@ describe("resolveEmailProvider", () => {
     expect(resolveEmailProvider({ EMAIL_PROVIDER: "resend" })).toBe(
       "nodemailer",
     );
+  });
+});
+
+describe("buildSmtpTransportOptions", () => {
+  it("defaults to local Mailpit without auth", () => {
+    expect(buildSmtpTransportOptions({})).toEqual({
+      host: "localhost",
+      port: 1025,
+      secure: false,
+    });
+  });
+
+  it("configures Resend SMTP with auth and secure port 465", () => {
+    expect(
+      buildSmtpTransportOptions({
+        SMTP_HOST: "smtp.resend.com",
+        SMTP_PORT: "465",
+        SMTP_USER: "resend",
+        SMTP_PASS: "re_test",
+      }),
+    ).toEqual({
+      host: "smtp.resend.com",
+      port: 465,
+      secure: true,
+      auth: {
+        user: "resend",
+        pass: "re_test",
+      },
+    });
+  });
+
+  it("honors SMTP_SECURE=true on non-465 ports", () => {
+    expect(
+      buildSmtpTransportOptions({
+        SMTP_HOST: "smtp.example.com",
+        SMTP_PORT: "587",
+        SMTP_SECURE: "true",
+        SMTP_USER: "user",
+        SMTP_PASS: "pass",
+      }),
+    ).toMatchObject({
+      port: 587,
+      secure: true,
+      auth: { user: "user", pass: "pass" },
+    });
   });
 });
 
