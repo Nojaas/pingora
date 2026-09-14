@@ -1,5 +1,6 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { buildSmtpTransportOptions } from "./email.js";
+import { sendEmailViaResend } from "./resend.js";
 import { buildSesClientConfig } from "./ses.js";
 import { resolveEmailProvider } from "./types.js";
 
@@ -12,12 +13,16 @@ describe("resolveEmailProvider", () => {
     expect(resolveEmailProvider({ EMAIL_PROVIDER: "ses" })).toBe("ses");
   });
 
+  it("selects resend", () => {
+    expect(resolveEmailProvider({ EMAIL_PROVIDER: "resend" })).toBe("resend");
+  });
+
   it("is case-insensitive", () => {
     expect(resolveEmailProvider({ EMAIL_PROVIDER: "SES" })).toBe("ses");
   });
 
   it("falls back to nodemailer for unknown values", () => {
-    expect(resolveEmailProvider({ EMAIL_PROVIDER: "resend" })).toBe(
+    expect(resolveEmailProvider({ EMAIL_PROVIDER: "mailgun" })).toBe(
       "nodemailer",
     );
   });
@@ -65,6 +70,50 @@ describe("buildSmtpTransportOptions", () => {
       secure: true,
       auth: { user: "user", pass: "pass" },
     });
+  });
+});
+
+describe("sendEmailViaResend", () => {
+  it("posts to Resend HTTP API and returns the email id", async () => {
+    const fetchImpl = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ id: "email_123" }),
+    });
+
+    const id = await sendEmailViaResend(
+      {
+        to: "user@example.com",
+        subject: "Hello",
+        body: "World",
+      },
+      {
+        RESEND_API_KEY: "re_test",
+        SMTP_FROM: "onboarding@resend.dev",
+      },
+      fetchImpl as unknown as typeof fetch,
+    );
+
+    expect(id).toBe("email_123");
+    expect(fetchImpl).toHaveBeenCalledWith(
+      "https://api.resend.com/emails",
+      expect.objectContaining({
+        method: "POST",
+        headers: {
+          Authorization: "Bearer re_test",
+          "Content-Type": "application/json",
+        },
+      }),
+    );
+  });
+
+  it("throws when RESEND_API_KEY is missing", async () => {
+    await expect(
+      sendEmailViaResend(
+        { to: "a@b.com", subject: "s", body: "b" },
+        {},
+        vi.fn() as unknown as typeof fetch,
+      ),
+    ).rejects.toThrow(/RESEND_API_KEY/);
   });
 });
 

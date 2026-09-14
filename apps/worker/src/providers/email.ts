@@ -1,4 +1,5 @@
 import nodemailer from "nodemailer";
+import { sendEmailViaResend } from "./resend.js";
 import { sendEmailViaSes } from "./ses.js";
 import { resolveEmailProvider, type SendEmailInput } from "./types.js";
 
@@ -61,6 +62,10 @@ export async function sendEmail(input: SendEmailInput): Promise<string> {
 
   if (provider === "ses") {
     return sendEmailViaSes(input);
+  }
+
+  if (provider === "resend") {
+    return sendEmailViaResend(input);
   }
 
   return sendEmailViaNodemailer(input);
